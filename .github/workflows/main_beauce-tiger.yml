@@ -21,9 +21,16 @@ jobs:
         with:
           node-version: '20.x'
 
-      - name: npm install, build, and test
+      - name: npm install, build, and test for beauce-tigers front
         run: |
           cd beauce-tigers
+          npm install
+          npm run build --if-present
+          npm run test --if-present
+
+      - name: npm install, build, and test for server-beauce
+        run: |
+          cd server-beauce
           npm install
           npm run build --if-present
           npm run test --if-present
