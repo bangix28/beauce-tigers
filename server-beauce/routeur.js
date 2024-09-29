@@ -43,7 +43,7 @@ class RouteurApi {
             const response = await axios.get(urlRanked,config);
             return response.data;
         } catch (error) {
-            console.error(`Error: ${error}`);
+            console.error(`Errore: ${error}`);
         }
     }
 }
