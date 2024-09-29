@@ -1,0 +1,5 @@
+routes:
+  - method: GET
+    route_api: /api/riotAccount
+    token: STRAPI_API_KEY
+    step: getRanked

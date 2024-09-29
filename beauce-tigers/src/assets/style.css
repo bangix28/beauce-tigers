@@ -1,0 +1,103 @@
+@font-face {
+    font-family: 'Beaufort-Bold'; /* Le nom que tu donneras à ta police */
+    src: url('fonts/Beaufort-Bold.ttf') format('truetype'); /* Chemin vers le fichier de police */
+    font-weight: 700; /* Optionnel : poids par défaut */
+    font-style: bold; /* Optionnel : style par défaut */
+}
+
+@font-face {
+    font-family: 'Beaufort-Regular'; /* Le nom que tu donneras à ta police */
+    src: url('fonts/Beaufort-Regular.ttf') format('truetype'); /* Chemin vers le fichier de police */
+    font-weight: normal; /* Optionnel : poids par défaut */
+    font-style: normal; /* Optionnel : style par défaut */
+}
+
+@font-face {
+    font-family: 'Spiegel-Regular'; /* Le nom que tu donneras à ta police */
+    src: url('fonts/Spiegel-Regular.ttf') format('truetype'); /* Chemin vers le fichier de police */
+    font-weight: 400; /* Optionnel : poids par défaut */
+    font-style: normal; /* Optionnel : style par défaut */
+}
+
+
+body {
+    background: #010A13;
+    margin: 100px 40px;
+}
+
+
+h1{
+    color: #F0E6D2;
+    font-family: 'Beaufort-Bold',serif;
+    font-size: 5.625em;
+    text-transform: uppercase;
+}
+
+h2{
+    color: #F0E6D2;
+    font-family: 'Beaufort-Bold',serif;
+    font-size: 40px;
+}
+
+h3{
+        color: #F0E6D2;
+        font-family: 'Beaufort-Bold',serif;
+        font-size: 28px;
+}
+
+h4{
+    color: #F0E6D2;
+    font-family: 'Beaufort-Bold',serif;
+    font-size: 14px;
+}
+
+span {
+    color: #F0E6D2;
+    font-family: 'spiegel',sans-serif;
+    font-size: 14px;
+}
+
+.img-separator{
+    width: 65%;
+}
+
+.separator {
+padding: 1px 0px;
+background: #C89B3C;
+}
+
+#classement{
+    border-top: 1px solid rgb(30, 35, 40);
+
+}
+
+.text{
+    color: #F0E6D2;
+    font-family: 'Beaufort-Bold',serif;
+}
+.summoner{
+    margin-top: 1em;
+}
+
+.img-fluid{
+    width: 140px;
+}
+
+.rankPod {
+    font-size: 0.75em;
+    font-family: 'Beaufort-Regular',sans-serif;
+}
+
+#podium{
+    height: 30vh;
+}
+
+.podium{
+    padding: 10px 25px;
+    font-size: 1em;
+    color: #F0E6D2;
+    font-family: 'Beaufort-Bold',serif;
+    border-top: 1px solid #C89B3C;
+    border-right: 1px solid #C89B3C;
+    border-left: 1px solid #C89B3C;
+}
