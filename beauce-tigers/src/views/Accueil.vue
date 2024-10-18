@@ -37,7 +37,8 @@ export default {
   },
   methods:{
     async fetchData() {
-      axios.get('http://localhost:3001/api/riotAccount')
+      let urlToFetch  = import.meta.env.VITE_RIOT_ACCOUNT_URL;
+      axios.get(urlToFetch)
         .then(response => {
           console.log(response.data);
           this.listSummoner = response.data.member.sort((a, b) => b.score - a.score);
