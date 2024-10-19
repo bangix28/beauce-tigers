@@ -29,8 +29,10 @@ app.get('/api/riotAccount', async (req, res) => {
 if (process.env.NODE_ENV === 'production') {
     const options = {
         key: fs.readFileSync(process.env.SSL_PRIVATE_KEY_PATH),
-        cert: fs.readFileSync(process.env.SSL_PRIVATE_CERT_PATH)
-    };
+        cert: fs.readFileSync(process.env.SSL_PRIVATE_CERT_PATH),
+        ca: fs.readFileSync(process.env.SSL_PRIVATE_CA_PATH),
+
+};
 
     https.createServer(options, app).listen(PORT, () => {
         console.log(`Server is running on port ${PORT} with SSL`);
