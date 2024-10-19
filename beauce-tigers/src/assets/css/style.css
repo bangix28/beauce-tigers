@@ -1,20 +1,20 @@
 @font-face {
     font-family: 'Beaufort-Bold'; /* Le nom que tu donneras à ta police */
-    src: url('fonts/Beaufort-Bold.ttf') format('truetype'); /* Chemin vers le fichier de police */
+    src: url('../fonts/Beaufort-Bold.ttf') format('truetype'); /* Chemin vers le fichier de police */
     font-weight: 700; /* Optionnel : poids par défaut */
     font-style: bold; /* Optionnel : style par défaut */
 }
 
 @font-face {
     font-family: 'Beaufort-Regular'; /* Le nom que tu donneras à ta police */
-    src: url('fonts/Beaufort-Regular.ttf') format('truetype'); /* Chemin vers le fichier de police */
+    src: url('../fonts/Beaufort-Regular.ttf') format('truetype'); /* Chemin vers le fichier de police */
     font-weight: normal; /* Optionnel : poids par défaut */
     font-style: normal; /* Optionnel : style par défaut */
 }
 
 @font-face {
     font-family: 'Spiegel-Regular'; /* Le nom que tu donneras à ta police */
-    src: url('fonts/Spiegel-Regular.ttf') format('truetype'); /* Chemin vers le fichier de police */
+    src: url('../fonts/Spiegel-Regular.ttf') format('truetype'); /* Chemin vers le fichier de police */
     font-weight: 400; /* Optionnel : poids par défaut */
     font-style: normal; /* Optionnel : style par défaut */
 }
@@ -73,11 +73,12 @@ background: #C89B3C;
 
 .text{
     color: #F0E6D2;
-    font-family: 'Beaufort-Bold',serif;
+    font-family: 'Spiegel-Regular',serif;
 }
 .summoner{
     margin-top: 1em;
 }
+
 
 .img-fluid{
     width: 140px;
