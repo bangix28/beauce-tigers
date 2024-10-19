@@ -8,8 +8,8 @@ import router from './router'
 const app = createApp(App)
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap/dist/js/bootstrap.js'
-import '@/assets/reset.css'
-import '@/assets/style.css'
+import '@/assets/css/reset.css'
+import '@/assets/css/style.css'
 
 app.use(createPinia())
 app.use(router)
