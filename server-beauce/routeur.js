@@ -32,7 +32,7 @@ class RouteurApi {
         }
     }
     async getRanked(token) {
-        let urlRanked = process.env.URL_API_BEAUCE + '/api/riotAccount/ranked';
+        let urlRanked = process.env.URL_API_BEAUCE + process.env.URL_ENDPOINT_RANKED;
         const config = {
             headers: {
                 'Content-Type': 'application/json',
@@ -43,7 +43,7 @@ class RouteurApi {
             const response = await axios.get(urlRanked,config);
             return response.data;
         } catch (error) {
-            console.error(`Errore: ${error}`);
+            console.error(`Error: ${error}`);
         }
     }
 }
