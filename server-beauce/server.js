@@ -2,16 +2,23 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const PORT = process.env.PORT || 3001;
-const token_strapi = process.env.TOKEN_STRAPI;
-const routes_strapi = process.env.ROUTES_STRAPI;
 const dotenv = require('dotenv');
-const Router = require("./routeur");
 const RouteurApi = require("./routeur");
-const algoliasearch = require("algoliasearch");
 const fs = require('fs');
 const https = require('https');
+const path = require('path');
 
-dotenv.config();
+
+const envFiles = {
+    dev: '.env.dev',
+    local: '.env.local',
+};
+const env = process.env.NODE_ENV || 'local';
+const envFile = envFiles[env];
+
+if (fs.existsSync(envFile)) {
+    dotenv.config({ path: path.resolve(__dirname, envFile) });
+}
 
 app.use(express.json());
 app.use(cors());
@@ -19,12 +26,30 @@ app.use(cors());
 app.get('/api/riotAccount', async (req, res) => {
     try {
         const token = await new RouteurApi().authWebServices()
-        const getRanked = await new RouteurApi().getRanked(token)
-        res.status(200).json(getRanked);
+        let url = process.env.URL_API_BEAUCE + process.env.URL_ENDPOINT_RANKED;
+        const getRanked = await new RouteurApi().callApi(token, url)
+        res.status(200).json(getRanked.data);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
+
+app.get('/api/riot-account/account/:id/collection/history', async (req, res) => {
+    try {
+        let url = process.env.URL_API_BEAUCE + process.env.URL_ENDPOINT_GET_LIST_HISTORY_ACCOUNT + '?page=1';
+        const accountId = req.params.id;
+
+        let regex = /\{id}/;
+        let newUrl = url.replace(regex, accountId);
+
+        const token = await new RouteurApi().authWebServices();
+        const getHistoryLol = await new RouteurApi().callApi(token, newUrl)
+
+        res.status(200).json(getHistoryLol.data);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+})
 
 if (process.env.NODE_ENV === 'production') {
     const options = {
