@@ -1,27 +1,21 @@
 <template>
-  <div>
-    <div
-      class="container d-flex flex-column justify-content-center align-items-center align-self-stretch"
-    >
-      <h1 class="display-1">Leaderboard</h1>
-    </div>
-    <!--Tableau-->
-    <h2 class="mb-3 col-12">Classement</h2>
-    <div id="classement" class="container fs-5">
-      <div v-for="(player, index) in listSummoner" :key="index" class="row align-items-center justify-content-center mt-3">
-      <SummonerDataList :playerData="player" :index="index" />
-      </div>
-    </div>
+  <div class="container mx-auto px-4 py-8">
+    <TopPlayerComponent v-if="listSummoner.length > 0" :listSummoner="listSummoner"/>
+    <RankedDashboard :listSummoner="listSummoner"/>
   </div>
 </template>
 
 <script>
-import SummonerDataList from "@/components/SummonerDataList.vue";
 import {ajaxMixins} from "@/mixins/ajaxMixins";
+import HeaderComponent from "@/components/HeaderComponent.vue";
+import TopPlayerComponent from "@/components/TopPlayerComponent.vue";
+import RankedDashboard from "@/components/RankedDashboard.vue";
 export default {
   name:"AcceuilComponent",
   components : {
-    SummonerDataList
+    HeaderComponent,
+    TopPlayerComponent,
+    RankedDashboard
   },
   mixins: [ajaxMixins],
   data(){
