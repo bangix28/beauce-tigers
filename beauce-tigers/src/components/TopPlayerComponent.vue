@@ -5,6 +5,8 @@
         :key="player.id"
         class="relative p-6 rounded-lg border border-gray-800"
         :class="badges[index].bgColor"
+        @click="playTeemoSound"
+
     >
       <div class="absolute top-4 right-4">
         <component :is="badges[index].icon" class="w-8 h-8" :class="badges[index].color" />
@@ -13,17 +15,17 @@
         <div class="relative">
           <img
               :src="getUrlIconSummoner(player.logoId)"
-              :alt="player.summonerName"
+              :alt="player.name"
               class="w-16 h-16 rounded-full border-2 border-lol-gold"
           />
           <div class="absolute -bottom-1 -right-1 bg-lol-dark rounded-full px-2 py-1 text-xs border border-lol-gold">
-            {{ player.summonerLevel }}
+            {{ player.level }}
           </div>
         </div>
         <div>
-          <h3 class="text-xl font-bold text-lol-gold">{{ player.summonerName }}</h3>
+          <h3 class="text-xl font-bold text-lol-gold">{{ player.name }}</h3>
           <div class="flex items-center mt-1 space-x-2">
-            <span class="text-sm text-gray-400">Niveau {{ player.summonerLevel }}</span>
+            <span class="text-sm text-gray-400">Niveau {{ player.level }}</span>
           </div>
         </div>
       </div>
@@ -34,7 +36,7 @@
         </div>
         <div class="bg-gray-800/50 rounded p-2">
           <div class="text-sm text-gray-400">Win Rate</div>
-          <div class="font-bold text-emerald-400">{{ calculateWinrate(player.summoner_ranked_solo_wins, player.summonerRankedSoloLosses) }}%</div>
+          <div class="font-bold text-emerald-400">{{ calculateWinrate(player.rankedSoloWins, player.rankedSoloLosses) }}%</div>
         </div>
         <div class="bg-gray-800/50 rounded p-2">
           <div class="text-sm text-gray-400">KDA</div>
@@ -65,9 +67,6 @@ export default {
         { icon: Award, color: 'text-amber-700', bgColor: 'bg-amber-700/10', scale: 1 },
       ],
     }
-  },
-  mounted() {
-    console.log(this.topPlayers);
   }
 };
 </script>

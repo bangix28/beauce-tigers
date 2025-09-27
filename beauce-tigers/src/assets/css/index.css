@@ -12,29 +12,22 @@
 /* Polices League of Legends */
 @font-face {
     font-family: 'BeaufortForLoL';
-    src: url('https://ff.cdn.1001fonts.net/b/e/beaufort-for-lol.regular.otf') format('opentype');
+    src: url("../fonts/Beaufort-Regular.ttf") format('opentype');
     font-weight: normal;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'BeaufortForLoL';
-    src: url('https://ff.cdn.1001fonts.net/b/e/beaufort-for-lol.bold.otf') format('opentype');
+    src: url('../fonts/Beaufort-Bold.ttf') format('opentype');
     font-weight: bold;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Spiegel';
-    src: url('https://ff.cdn.1001fonts.net/s/p/spiegel-tt-regular.regular.ttf') format('truetype');
+    src: url('../fonts/Spiegel-Regular.ttf') format('opentype');
     font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'Spiegel';
-    src: url('https://ff.cdn.1001fonts.net/s/p/spiegel-tt-regular.bold.ttf') format('truetype');
-    font-weight: bold;
     font-style: normal;
 }
 
@@ -44,7 +37,7 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-beaufort);
+    font-family: var(--font-beaufort), serif;
 }
 
 .btn {

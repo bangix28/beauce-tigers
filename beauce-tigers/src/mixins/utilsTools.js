@@ -1,3 +1,4 @@
+import { format } from 'date-fns'
 
 export const utilsTools = {
     methods: {
@@ -23,6 +24,45 @@ export const utilsTools = {
 
         getUrlIconSummoner(iconID) {
           return `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/${iconID}.jpg`
+        },
+
+        getUrlIconChampion(iconID) {
+          return `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${iconID}.png`
+        },
+
+        getTeemoSound(){
+          return `https://raw.communitydragon.org/latest/plugins/rcp-fe-audio/global/default/teemo.ogg`
+        },
+
+        // Simple helper to play audio from a URL. Uses HTMLAudioElement.
+        playAudioFrom(url) {
+          try {
+            const audio = new Audio(url);
+            // Avoid very loud volume by default (optional slight improvement)
+            audio.volume = 0.9;
+            audio.play().catch((e) => {
+              // Some browsers require user gesture; clicking the card counts as gesture
+              console.warn('Audio play prevented or failed:', e);
+            });
+          } catch (e) {
+            console.error('Failed to initialize audio:', e);
+          }
+        },
+
+        // Convenience method to play the Teemo sound defined above
+        playTeemoSound() {
+          this.playAudioFrom(this.getTeemoSound());
+        },
+
+      formatDate(date, formatString = 'dd/MM/yyyy') {
+        if (!date) return '';
+        try {
+          return format(new Date(date), formatString);
+        } catch (e) {
+          console.error('Erreur de formatage de date dans la Mixin:', e);
+          return '';
         }
+      },
+
     }
 };

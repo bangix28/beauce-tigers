@@ -3,9 +3,6 @@
     <div class="space-y-4">
       <div class="flex items-center justify-between mb-6">
         <h2 class="text-3xl mt-10 font-bold text-lol-gold">Classement Global</h2>
-        <button class="flex items-center gap-2 px-4 py-2 bg-lol-darker hover:bg-gray-800 rounded-lg text-gray-300 transition-colors">
-          <span class="hidden sm:inline">Actualiser</span>
-        </button>
       </div>
       <div class="bg-lol-darker rounded-lg border border-gray-800 overflow-hidden">
         <div class="hidden md:grid grid-cols-12 gap-2 p-4 text-sm font-semibold text-gray-400 border-b border-gray-800">

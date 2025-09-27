@@ -17,13 +17,5 @@ export const ajaxMixins = {
               console.error(error);
           }
         },
-        randomLoadingMessage(loadingHistory, loadingMessages) {
-            let currentLoadingMessage = 'Loading...';
-            if (loadingHistory) {
-                const randomIndex = Math.floor(Math.random() * loadingMessages.length);
-                currentLoadingMessage = loadingMessages[randomIndex];
-            }
-            return currentLoadingMessage;
-        }
     }
 };

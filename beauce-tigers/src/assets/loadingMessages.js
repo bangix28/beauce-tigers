@@ -7,5 +7,6 @@ export const LOADING_MESSAGES =  [
     "On attend Sharif !",
     "Attention aux escaliers !",
     "#SLYWIN !",
-    "Il est où, Hugo ?"
+    "Il est où, Hugo ?",
+    "Tu me vois pas la ?"
 ];

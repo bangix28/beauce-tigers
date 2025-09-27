@@ -32,7 +32,7 @@
 export default {
   data() {
     return {
-      menuItems: ['Tableau de bord', 'Comparer', 'Paramètres'],
+      menuItems: ['Tableau de bord'],
     };
   },
 };

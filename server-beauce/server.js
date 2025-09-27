@@ -1,8 +1,8 @@
+const dotenv = require('dotenv');
 const express = require('express');
 const app = express();
 const cors = require('cors');
 const PORT = process.env.PORT || 3001;
-const dotenv = require('dotenv');
 const RouteurApi = require("./routeur");
 const fs = require('fs');
 const https = require('https');
@@ -23,11 +23,12 @@ if (fs.existsSync(envFile)) {
 app.use(express.json());
 app.use(cors());
 
-app.get('/api/riotAccount', async (req, res) => {
+app.get('/api/riot-account', async (req, res) => {
     try {
         const token = await new RouteurApi().authWebServices()
         let url = process.env.URL_API_BEAUCE + process.env.URL_ENDPOINT_RANKED;
         const getRanked = await new RouteurApi().callApi(token, url)
+
         res.status(200).json(getRanked.data);
     } catch (error) {
         res.status(500).json({ error: error.message });
