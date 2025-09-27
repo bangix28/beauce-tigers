@@ -1,0 +1,120 @@
+/* styles.css */
+@import "tailwindcss";
+
+@theme {
+    --color-lol-gold: #C8AA6E;
+    --color-lol-blue: #0AC8B9;
+    --color-lol-dark: #091428;
+    --color-lol-darker: #0A1428;
+    --font-beaufort: 'BeaufortForLoL', serif;
+}
+
+/* Polices League of Legends */
+@font-face {
+    font-family: 'BeaufortForLoL';
+    src: url("../fonts/Beaufort-Regular.ttf") format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'BeaufortForLoL';
+    src: url('../fonts/Beaufort-Bold.ttf') format('opentype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Spiegel';
+    src: url('../fonts/Spiegel-Regular.ttf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+    @apply bg-lol-dark text-gray-100;
+    font-family: 'Spiegel', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-beaufort), serif;
+}
+
+.btn {
+    @apply px-4 py-2 rounded-lg transition-all duration-200 font-semibold transform hover:scale-105 hover:shadow-lg active:scale-95;
+    font-family: var(--font-beaufort);
+}
+
+.btn-primary {
+    @apply bg-lol-gold text-lol-dark hover:bg-yellow-600 hover:shadow-yellow-500/20;
+}
+
+.btn-secondary {
+    @apply bg-lol-blue text-white hover:bg-blue-600 hover:shadow-blue-500/20;
+}
+
+.input {
+    @apply px-4 py-2 bg-lol-darker border border-gray-700 rounded-lg focus:outline-none focus:border-lol-gold text-gray-100 transition-all duration-200;
+}
+
+/* Styles pour le tableau */
+.leaderboard-row {
+    @apply grid grid-cols-12 gap-2 items-center p-4 hover:bg-gray-800/50 transition-all duration-200 transform hover:scale-[1.01] hover:shadow-lg;
+}
+
+.leaderboard-header {
+    @apply text-sm font-semibold text-gray-400;
+    font-family: var(--font-beaufort);
+}
+
+.leaderboard-cell {
+    @apply flex items-center;
+}
+
+/* Animations personnalisées */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Effets de survol pour les cartes */
+.card {
+    @apply bg-lol-darker rounded-lg border border-gray-800 p-4 transition-all duration-300;
+}
+
+.card:hover {
+    @apply border-lol-gold shadow-lg shadow-lol-gold/10 transform scale-[1.02];
+}
+
+/* Effet de brillance au survol */
+.hover-glow {
+    @apply relative overflow-hidden;
+}
+
+.hover-glow::after {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full;
+    transition: transform 0.6s ease;
+}
+
+.hover-glow:hover::after {
+    @apply translate-x-full;
+}
+
+/* Support tactile */
+@media (hover: none) {
+    .btn:active,
+    .card:active {
+        @apply scale-95;
+    }
+}

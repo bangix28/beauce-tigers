@@ -1,45 +1,52 @@
 <template>
-  <div>
-    <div
-      class="container d-flex flex-column justify-content-center align-items-center align-self-stretch"
-    >
-      <h1 class="display-1">Leaderboard</h1>
-    </div>
-    <!--Tableau-->
-    <h2 class="mb-3 col-12">Classement</h2>
-    <div id="classement" class="container fs-5">
-      <div v-for="(player, index) in listSummoner" :key="index" class="row align-items-center justify-content-center mt-3">
-      <SummonerDataList :playerData="player" :index="index" />
-      </div>
-    </div>
+  <div class="container mx-auto px-10 py-8">
+    <TopPlayerComponent v-if="listSummoner.length > 0" :listSummoner="listSummoner" />
+    <RankedDashboard :listSummoner="listSummoner" />
   </div>
 </template>
 
 <script>
-import SummonerDataList from "@/components/SummonerDataList.vue";
-import {ajaxMixins} from "@/mixins/ajaxMixins";
+import { ajaxMixins } from '@/mixins/ajaxMixins'
+import HeaderComponent from '@/components/HeaderComponent.vue'
+import TopPlayerComponent from '@/components/TopPlayerComponent.vue'
+import RankedDashboard from '@/components/RankedDashboard.vue'
+import { usePlayerDataStore } from '@/stores/playerStore'
+
 export default {
-  name:"AcceuilComponent",
-  components : {
-    SummonerDataList
+  name: 'AcceuilComponent',
+  components: {
+    HeaderComponent,
+    TopPlayerComponent,
+    RankedDashboard
   },
   mixins: [ajaxMixins],
-  data(){
+  data() {
     return {
-      listSummoner: []
+      listSummoner: [],
+      refreshIntervalId: null
     }
   },
-  mounted() {
-    this.loadDataListSummoner()
+  methods: {
+    async refreshList() {
+      const playerStore = usePlayerDataStore()
+      await playerStore.fetchListPlayerData()
+      this.listSummoner = playerStore.playerData.sort((a, b) => b.score - a.score)
+      console.log(this.listSummoner, this.refreshIntervalId)
+    }
   },
-  methods:{
-    loadDataListSummoner () {
-      let urlToFetch = import.meta.env.VITE_RIOT_ACCOUNT_URL;
-      this.fetchData(urlToFetch, responseData => {
-        this.listSummoner = responseData.member.sort((a, b) => b.score - a.score);
-      });
-    },
+  async mounted() {
+    await this.refreshList()
+
+    this.refreshIntervalId = setInterval(() => {
+      this.refreshList()
+    }, 30 * 60 * 1000)
   },
+  beforeUnmount() {
+    if (this.refreshIntervalId) {
+      clearInterval(this.refreshIntervalId)
+      this.refreshIntervalId = null
+    }
+  }
 }
 </script>
 
