@@ -1,4 +1,5 @@
 import { format } from 'date-fns'
+import { RANKED_EMBLEMS } from '@/assets/rankedEmblems.js'
 
 export const utilsTools = {
     methods: {
@@ -28,6 +29,12 @@ export const utilsTools = {
 
         getUrlIconChampion(iconID) {
           return `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${iconID}.png`
+        },
+
+        // Emblèmes ailés servis en local (rognés de leur marge transparente) ;
+        // les non-classés ont droit à un poro qui fait la sieste
+        getUrlTierEmblem(tier) {
+          return RANKED_EMBLEMS[tier] ?? RANKED_EMBLEMS.UNRANKED
         },
 
         getTeemoSound(){

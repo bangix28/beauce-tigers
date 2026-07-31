@@ -39,8 +39,8 @@
           <div class="font-bold text-emerald-400">{{ calculateWinrate(player.rankedSoloWins, player.rankedSoloLosses) }}%</div>
         </div>
         <div class="bg-gray-800/50 rounded p-2">
-          <div class="text-sm text-gray-400">KDA</div>
-          <div class="font-bold text-yellow-400">3.2</div>
+          <div class="text-sm text-gray-400">LP</div>
+          <div class="font-bold text-yellow-400">{{ player.rankedSoloPoints ?? 0 }}</div>
         </div>
       </div>
     </div>
