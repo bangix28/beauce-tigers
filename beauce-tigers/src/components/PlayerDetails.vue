@@ -43,6 +43,10 @@
             </div>
 
             <div class="text-center w-full">
+              <p v-if="history.championName" class="text-sm font-bold text-lol-gold mb-1">
+                {{ history.championName }}
+              </p>
+
               <p class="text-sm font-semibold mb-2">
                 <span v-html="getKdaFormat(history).htmlKDA"></span>
               </p>
@@ -58,7 +62,18 @@
             </div>
 
             <div class="mt-2 w-full text-center border-t border-gray-700 pt-2">
-              <p class="text-xs text-gray-400 mb-1">Durée : {{ history.gameDuration }} minutes</p>
+              <p
+                v-if="history.creepScore != null || history.visionScore != null"
+                class="text-xs text-gray-400 mb-1"
+              >
+                <span v-if="history.creepScore != null">{{ history.creepScore }} CS</span>
+                <span v-if="history.creepScore != null && history.visionScore != null"> · </span>
+                <span v-if="history.visionScore != null">Vision {{ history.visionScore }}</span>
+              </p>
+
+              <p v-if="history.gameDuration != null" class="text-xs text-gray-400 mb-1">
+                Durée : {{ history.gameDuration }} minutes
+              </p>
 
               <p class="text-xs text-gray-500">
                 {{ formatDate(history.dateGameEnd) }}

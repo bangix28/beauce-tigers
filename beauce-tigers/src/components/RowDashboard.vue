@@ -22,10 +22,35 @@
                    class="w-10 h-10 rounded-full border border-lol-gold"
                    :src="getUrlIconSummoner(playerData.logoId)">
               <div>
-                <div class="font-bold text-white">{{ playerData.name }}</div>
+                <div class="flex items-center gap-1.5">
+                  <div class="font-bold text-white">{{ playerData.name }}</div>
+                  <span v-if="playerData.soloHotStreak" title="Série de victoires en cours">
+                    <Flame class="w-3.5 h-3.5 text-orange-400" />
+                  </span>
+                  <span v-if="playerData.soloVeteran" title="Vétéran de la division (100+ parties)">
+                    <Medal class="w-3 h-3 text-gray-500" />
+                  </span>
+                  <span v-if="playerData.soloFreshBlood" title="Nouveau dans la division">
+                    <Sparkles class="w-3 h-3 text-gray-500" />
+                  </span>
+                </div>
                 <div class="text-xs text-gray-400">Niveau {{ playerData.level }}</div>
-                <div class="text-sm text-gray-300 font-semibold">
-                  {{ playerData.rankedSoloTiers || 'Unranked' }} {{ playerData.rankedSoloRanks}}
+                <div class="mt-1 inline-flex flex-col items-center" :title="rankTitle">
+                  <img :src="tierEmblemUrl"
+                       :alt="rankTitle"
+                       class="w-auto object-contain drop-shadow-lg"
+                       :class="isUnranked ? 'h-10' : 'h-16'">
+                  <span v-if="divisionLabel"
+                        class="text-xs font-bold tracking-widest"
+                        :class="tierColorClass">{{ divisionLabel }}</span>
+                  <div v-if="miniSeriesSlots.length"
+                       class="mt-0.5 flex items-center gap-1"
+                       :title="`Série de promotion : ${playerData.soloMiniSeriesWins ?? 0}V / ${playerData.soloMiniSeriesLosses ?? 0}D`">
+                    <span v-for="(slot, i) in miniSeriesSlots"
+                          :key="i"
+                          class="w-2 h-2 rounded-full"
+                          :class="slot === 'W' ? 'bg-green-400' : slot === 'L' ? 'bg-red-400' : 'bg-gray-600'"></span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -47,7 +72,7 @@
           <div class="mt-3 grid grid-cols-3 gap-2 text-center text-sm">
             <div class="bg-gray-700 rounded p-2 border border-gray-600">
               <div class="text-gray-400">LP</div>
-              <div class="font-bold text-lol-gold">{{ playerData.rankedSoloPoints || 0 }} LP</div>
+              <div class="font-bold text-lol-gold">{{ playerData.rankedSoloPoints ?? 0 }} LP</div>
             </div>
             <div class="bg-gray-700 rounded p-2 border border-gray-600">
               <div class="text-gray-400">Win Rate</div>
@@ -58,7 +83,7 @@
             </div>
             <div class="bg-gray-700 rounded p-2 border border-gray-600">
               <div class="text-gray-400">V/D</div>
-              <div class="font-bold text-white">{{ playerData.rankedSoloWins || 0 }}/{{ playerData.rankedSoloLosses || 0 }}</div>
+              <div class="font-bold text-white">{{ playerData.rankedSoloWins ?? 0 }}/{{ playerData.rankedSoloLosses ?? 0 }}</div>
             </div>
           </div>
         </div>
@@ -73,22 +98,49 @@
                  class="w-14 h-14 rounded-full border-2 border-lol-gold"
                  :src="getUrlIconSummoner(playerData.logoId)">
             <div>
-              <div class="font-extrabold text-white text-base">{{ playerData.name }}</div>
+              <div class="flex items-center gap-1.5">
+                <div class="font-extrabold text-white text-base">{{ playerData.name }}</div>
+                <span v-if="playerData.soloHotStreak" title="Série de victoires en cours">
+                  <Flame class="w-4 h-4 text-orange-400" />
+                </span>
+                <span v-if="playerData.soloVeteran" title="Vétéran de la division (100+ parties)">
+                  <Medal class="w-3.5 h-3.5 text-gray-500" />
+                </span>
+                <span v-if="playerData.soloFreshBlood" title="Nouveau dans la division">
+                  <Sparkles class="w-3.5 h-3.5 text-gray-500" />
+                </span>
+              </div>
               <div class="text-xs text-gray-500">Niveau {{ playerData.level }}</div>
             </div>
           </div>
-          <div class="col-span-2 font-extrabold text-lg text-gray-300">
-            {{ playerData.rankedSoloTiers }} {{ playerData.rankedSoloRanks}}
+          <div class="col-span-2">
+            <div class="flex flex-col items-center w-40 max-w-full" :title="rankTitle">
+              <img :src="tierEmblemUrl"
+                   :alt="rankTitle"
+                   class="w-auto object-contain drop-shadow-lg"
+                   :class="isUnranked ? 'h-14' : 'h-24'">
+              <span v-if="divisionLabel"
+                    class="text-sm font-bold tracking-widest"
+                    :class="tierColorClass">{{ divisionLabel }}</span>
+              <div v-if="miniSeriesSlots.length"
+                   class="mt-1 flex items-center gap-1"
+                   :title="`Série de promotion : ${playerData.soloMiniSeriesWins ?? 0}V / ${playerData.soloMiniSeriesLosses ?? 0}D`">
+                <span v-for="(slot, i) in miniSeriesSlots"
+                      :key="i"
+                      class="w-2 h-2 rounded-full"
+                      :class="slot === 'W' ? 'bg-green-400' : slot === 'L' ? 'bg-red-400' : 'bg-gray-600'"></span>
+              </div>
+            </div>
           </div>
-          <template v-if="playerData.rankedSoloPoints">
-            <div class="col-span-2 font-extrabold text-lol-gold text-lg">{{ playerData.rankedSoloPoints || 0 }} LP</div>
+          <template v-if="isRanked">
+            <div class="col-span-2 font-extrabold text-lol-gold text-lg">{{ playerData.rankedSoloPoints ?? 0 }} LP</div>
             <div class="col-span-2">
                 <span class="font-extrabold text-lg"
                       :class="calculateWinrate(playerData.rankedSoloWins, playerData.rankedSoloLosses) > 50 ? 'text-green-400' : 'text-red-400'">
                       {{ calculateWinrate(playerData.rankedSoloWins, playerData.rankedSoloLosses) }}%
                 </span>
             </div>
-            <div class="col-span-2 text-gray-300 font-bold">{{ playerData.rankedSoloWins || 0 }}/{{ playerData.rankedSoloLosses || 0 }}</div>
+            <div class="col-span-2 text-gray-300 font-bold">{{ playerData.rankedSoloWins ?? 0 }}/{{ playerData.rankedSoloLosses ?? 0 }}</div>
           </template>
         </div>
       </div>
@@ -100,9 +152,10 @@
 <script>
 import {utilsTools} from "@/mixins/utilsTools.js";
 import PlayerDetails from "@/components/PlayerDetails.vue";
+import { Flame, Medal, Sparkles } from 'lucide-vue-next';
 export default {
   name: 'RowDashboard',
-  components: { PlayerDetails },
+  components: { PlayerDetails, Flame, Medal, Sparkles },
   props: {
     index: {
       type: Number,
@@ -118,6 +171,51 @@ export default {
     return {
       toogleHistory: false,
     }
+  },
+  computed: {
+    isRanked() {
+      // != null couvre null ET undefined : un joueur à 0 LP reste affiché
+      return this.playerData.rankedSoloPoints != null;
+    },
+    tierEmblemUrl() {
+      return this.getUrlTierEmblem(this.playerData.rankedSoloTiers);
+    },
+    rankTitle() {
+      const tier = this.playerData.rankedSoloTiers;
+      if (!tier || tier === 'UNRANKED') return 'UNRANKED — le poro fait la sieste';
+      return `${tier} ${this.playerData.rankedSoloRanks ?? ''}`.trim();
+    },
+    divisionLabel() {
+      const rank = this.playerData.rankedSoloRanks;
+      if (!rank || rank === 'UNRANKED') return null;
+      return rank;
+    },
+    isUnranked() {
+      const tier = this.playerData.rankedSoloTiers;
+      return !tier || tier === 'UNRANKED';
+    },
+    tierColorClass() {
+      const colors = {
+        IRON: 'text-zinc-400',
+        BRONZE: 'text-amber-600',
+        SILVER: 'text-slate-300',
+        GOLD: 'text-yellow-400',
+        PLATINUM: 'text-teal-300',
+        EMERALD: 'text-emerald-400',
+        DIAMOND: 'text-blue-300',
+        MASTER: 'text-purple-400',
+        GRANDMASTER: 'text-red-400',
+        CHALLENGER: 'text-cyan-300',
+      };
+      return colors[this.playerData.rankedSoloTiers] || 'text-gray-300';
+    },
+    miniSeriesSlots() {
+      const p = this.playerData;
+      if (!p.soloMiniSeriesTarget) return [];
+      const progress = (p.soloMiniSeriesProgress || '').toUpperCase();
+      const total = 2 * p.soloMiniSeriesTarget - 1; // Bo5 (target 3) → 5 pastilles
+      return Array.from({ length: total }, (_, i) => progress[i] || 'N');
+    },
   },
   methods: {
     toggleDetails() {
