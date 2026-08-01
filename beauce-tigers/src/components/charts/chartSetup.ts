@@ -34,6 +34,8 @@ export const LOL_BLUE = '#0AC8B9'
 export const LOL_DARKER = '#0A1428'
 // Rouge désaturé pour les défaites/dégâts subis (moins agressif que le rouge pur)
 export const LOL_RED = '#c6403b'
+// Vert victoire (même valeur que le green-500 Tailwind utilisé pour les bordures de win)
+export const LOL_GREEN = '#22c55e'
 // Gris foncé des grilles et pistes (assorti aux bordures du site)
 export const LOL_GRID = '#1e2d45'
 

@@ -272,15 +272,7 @@ import DamageBarChart from '@/components/charts/DamageBarChart.vue'
 import KillParticipationGauge from '@/components/charts/KillParticipationGauge.vue'
 import MatchRadarChart from '@/components/charts/MatchRadarChart.vue'
 import StatTile from '@/components/charts/StatTile.vue'
-
-// Libellés d'affichage des rôles Riot
-const ROLE_LABELS = {
-  TOP: 'Toplane',
-  JUNGLE: 'Jungle',
-  MIDDLE: 'Midlane',
-  BOTTOM: 'ADC',
-  UTILITY: 'Support'
-}
+import { ROLE_LABELS } from '@/utils/roles'
 
 export default {
   name: 'MatchDetails',

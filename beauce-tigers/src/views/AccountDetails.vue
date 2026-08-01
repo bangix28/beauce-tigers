@@ -58,10 +58,33 @@
           </div>
         </div>
         <EloDailyChart :points="filteredEloPoints" />
+
+        <!-- Variations journalières dérivées de la même série, mêmes filtres -->
+        <div class="hextech-divider my-6"></div>
+        <h3 class="text-sm uppercase tracking-widest text-gray-400 mb-4">Gains / pertes par jour</h3>
+        <LpGainBarChart :points="filteredEloPoints" />
+      </div>
+
+      <!-- Stats des derniers matchs -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+        <div class="hextech-card animate-fade-in" style="animation-delay: 0.2s">
+          <h2 class="hextech-title">Forme récente</h2>
+          <RecentFormSummary :histories="histories" />
+        </div>
+
+        <div v-if="hasRoles" class="hextech-card animate-fade-in" style="animation-delay: 0.3s">
+          <h2 class="hextech-title">Répartition des rôles</h2>
+          <RolesDoughnutChart :histories="histories" />
+        </div>
+
+        <div class="hextech-card animate-fade-in" style="animation-delay: 0.4s">
+          <h2 class="hextech-title">Champions joués</h2>
+          <ChampionsPlayedList :histories="histories" />
+        </div>
       </div>
 
       <!-- Historique des matchs -->
-      <div class="hextech-card mt-8 animate-fade-in" style="animation-delay: 0.2s">
+      <div class="hextech-card mt-8 animate-fade-in" style="animation-delay: 0.5s">
         <h2 class="hextech-title">Historique des {{ historyCount }} derniers matchs</h2>
         <MatchHistoryList
           :histories="histories"
@@ -82,7 +105,11 @@ import { subDays, subMonths } from 'date-fns'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import AccountHeader from '@/components/account/AccountHeader.vue'
 import MatchHistoryList from '@/components/account/MatchHistoryList.vue'
+import RecentFormSummary from '@/components/account/RecentFormSummary.vue'
+import ChampionsPlayedList from '@/components/account/ChampionsPlayedList.vue'
 import EloDailyChart from '@/components/charts/EloDailyChart.vue'
+import LpGainBarChart from '@/components/charts/LpGainBarChart.vue'
+import RolesDoughnutChart from '@/components/charts/RolesDoughnutChart.vue'
 
 const PERIODS = [
   { key: '7d', label: '7 jours' },
@@ -99,7 +126,11 @@ export default {
     LoadingSpinner,
     AccountHeader,
     MatchHistoryList,
-    EloDailyChart
+    RecentFormSummary,
+    ChampionsPlayedList,
+    EloDailyChart,
+    LpGainBarChart,
+    RolesDoughnutChart
   },
   created() {
     this.accountDetailStore = useAccountDetailStore()
@@ -167,6 +198,10 @@ export default {
     },
     eloPoints() {
       return this.eloDailyStore.seriesById[this.accountId] ?? []
+    },
+    hasRoles() {
+      // Vieux matchs sans teamPosition : la carte disparaît plutôt qu'un doughnut vide
+      return this.histories.some((h) => h.teamPosition)
     },
     filteredEloPoints() {
       if (this.period === 'all') return this.eloPoints

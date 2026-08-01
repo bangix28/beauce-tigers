@@ -34,6 +34,7 @@ export const usePlayerHistoryStore = defineStore('playerHistory', () => {
       dateGameEnd: item.dateGameEnd,
       champion: item.championId,
       championName: item.championName ?? null,
+      teamPosition: item.teamPosition ?? null,
       // Number() tolère l'ancien format string "32" comme le nouveau int 32
       gameDuration: item.gameDuration != null ? Number(item.gameDuration) : null,
       assist: item.assistPlayer,
