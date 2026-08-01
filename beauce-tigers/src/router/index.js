@@ -22,6 +22,13 @@ const router = createRouter({
       component: () => import('@/views/MatchDetails.vue'),
       props: true
     },
+    {
+      path: '/account/:id',
+      name: 'AccountDetails',
+      // Lazy pour la même raison : la courbe d'elo embarque Chart.js
+      component: () => import('@/views/AccountDetails.vue'),
+      props: true
+    },
   ]
 })
 

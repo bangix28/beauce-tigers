@@ -4,7 +4,7 @@
     <!-- % centré par superposition : plus simple et plus stylable qu'un plugin Chart.js -->
     <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
       <span class="font-beaufort text-2xl font-bold text-lol-gold">{{ percentLabel }}</span>
-      <span class="text-[0.6rem] uppercase tracking-widest text-gray-400">Kill Part.</span>
+      <span class="text-[0.6rem] uppercase tracking-widest text-gray-400">{{ label }}</span>
     </div>
   </div>
 </template>
@@ -21,6 +21,11 @@ export default {
     value: {
       type: Number,
       required: true
+    },
+    // Libellé sous le pourcentage : la jauge sert aussi au winrate de la page compte
+    label: {
+      type: String,
+      default: 'Kill Part.'
     }
   },
   computed: {

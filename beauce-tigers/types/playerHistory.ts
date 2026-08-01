@@ -4,6 +4,7 @@ export interface PlayerHistory {
   dateGameEnd: Date
   champion: number
   championName: string | null
+  teamPosition: string | null
   gameDuration: number | null
   assist: number
   deaths: number

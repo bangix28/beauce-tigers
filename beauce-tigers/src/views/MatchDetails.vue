@@ -1,12 +1,12 @@
 <template>
   <div class="container mx-auto px-4 py-6">
-    <!-- Retour -->
+    <!-- Retour (dynamique : classement, ou page compte si on vient de son historique) -->
     <button
       class="flex items-center gap-2 font-beaufort text-lol-gold hover:text-lol-blue transition-colors duration-200 mb-6"
-      @click="$router.push('/')"
+      @click="$router.push(backTarget.to)"
     >
       <ArrowLeft class="w-5 h-5" />
-      Retour au classement
+      {{ backTarget.label }}
     </button>
 
     <!-- Chargement -->
@@ -18,7 +18,7 @@
       <p class="font-beaufort text-xl text-gray-300">
         Ce match n'existe pas dans les archives de la Beauce.
       </p>
-      <button class="btn btn-primary" @click="$router.push('/')">Retour au classement</button>
+      <button class="btn btn-primary" @click="$router.push(backTarget.to)">{{ backTarget.label }}</button>
     </div>
 
     <!-- Erreur générique -->
@@ -27,7 +27,7 @@
       <p class="font-beaufort text-xl text-gray-300">
         Impossible de récupérer ce match pour le moment.
       </p>
-      <button class="btn btn-primary" @click="$router.push('/')">Retour au classement</button>
+      <button class="btn btn-primary" @click="$router.push(backTarget.to)">{{ backTarget.label }}</button>
     </div>
 
     <!-- Détail du match -->
@@ -272,15 +272,7 @@ import DamageBarChart from '@/components/charts/DamageBarChart.vue'
 import KillParticipationGauge from '@/components/charts/KillParticipationGauge.vue'
 import MatchRadarChart from '@/components/charts/MatchRadarChart.vue'
 import StatTile from '@/components/charts/StatTile.vue'
-
-// Libellés d'affichage des rôles Riot
-const ROLE_LABELS = {
-  TOP: 'Toplane',
-  JUNGLE: 'Jungle',
-  MIDDLE: 'Midlane',
-  BOTTOM: 'ADC',
-  UTILITY: 'Support'
-}
+import { ROLE_LABELS } from '@/utils/roles'
 
 export default {
   name: 'MatchDetails',
@@ -360,6 +352,22 @@ export default {
     },
     playerName() {
       return this.$route.query.player ?? null
+    },
+    // Provenance en query (survit au F5) : depuis l'historique d'un compte,
+    // le retour ramène à la page compte plutôt qu'au classement global
+    backTarget() {
+      const accountId = Number(this.$route.query.accountId)
+      if (
+        this.$route.query.from === 'account' &&
+        Number.isInteger(accountId) &&
+        accountId > 0
+      ) {
+        return {
+          to: { name: 'AccountDetails', params: { id: accountId } },
+          label: "Retour à l'historique"
+        }
+      }
+      return { to: '/', label: 'Retour au classement' }
     },
     roleLabel() {
       if (!this.match?.teamPosition) return null
