@@ -38,6 +38,15 @@ export const utilsTools = {
           return `https://cdn.communitydragon.org/latest/champion/${championId}/splash-art/centered`
         },
 
+        // Réplique du champion en VF : voix de sélection ou de ban, tirée au
+        // sort à chaque appel. Seules voix par champion exposées en fichiers
+        // individuels par CommunityDragon (les VO en jeu restent dans les
+        // banques WWise non extraites)
+        getUrlChampionVoiceLine(championId) {
+          const type = Math.random() < 0.5 ? 'champion-choose-vo' : 'champion-ban-vo'
+          return `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/fr_fr/v1/${type}/${championId}.ogg`
+        },
+
         // Emblèmes ailés servis en local (rognés de leur marge transparente) ;
         // les non-classés ont droit à un poro qui fait la sieste
         getUrlTierEmblem(tier) {

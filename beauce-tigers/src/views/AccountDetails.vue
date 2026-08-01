@@ -34,7 +34,7 @@
     <div v-else-if="account">
       <!-- Bannière du compte -->
       <div class="animate-fade-in">
-        <AccountHeader :account="account" />
+        <AccountHeader :account="account" :histories="histories" />
       </div>
 
       <!-- Évolution du classement -->
