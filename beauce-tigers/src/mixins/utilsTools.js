@@ -31,6 +31,13 @@ export const utilsTools = {
           return `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${iconID}.png`
         },
 
+        // Splash centré par championId, sans gestion de version ("latest").
+        // Les icônes items/sorts/runes nécessitent un catalogue id → chemin :
+        // elles vivent dans le store assetCatalogStore, pas ici
+        getUrlChampionSplash(championId) {
+          return `https://cdn.communitydragon.org/latest/champion/${championId}/splash-art/centered`
+        },
+
         // Emblèmes ailés servis en local (rognés de leur marge transparente) ;
         // les non-classés ont droit à un poro qui fait la sieste
         getUrlTierEmblem(tier) {
