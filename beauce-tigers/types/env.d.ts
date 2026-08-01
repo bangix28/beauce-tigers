@@ -4,6 +4,7 @@ interface ImportMetaEnv {
   readonly VITE_STRAPI_URL: string;
   readonly VITE_RIOT_ACCOUNT_URL: string;
   readonly VITE_RIOT_HISTORY_URL: string;
+  readonly VITE_RIOT_MATCH_DETAIL_URL: string;
 }
 
 interface ImportMeta {

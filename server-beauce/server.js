@@ -52,6 +52,28 @@ app.get('/api/riot-account/account/:id/collection/history', async (req, res) => 
     }
 })
 
+app.get('/api/history-account-lol/:id', async (req, res) => {
+    try {
+        let url = process.env.URL_API_BEAUCE + process.env.URL_ENDPOINT_GET_DETAIL_HISTORY;
+
+        let regex = /\{id}/;
+        let newUrl = url.replace(regex, req.params.id);
+
+        const token = await new RouteurApi().authWebServices();
+        const getDetail = await new RouteurApi().callApi(token, newUrl);
+
+        // callApi avale les erreurs et retourne undefined (404 Symfony inclus) :
+        // sans ce check, getDetail.data lèverait un TypeError → 500 générique
+        if (!getDetail) {
+            return res.status(404).json({ error: 'Match introuvable' });
+        }
+
+        res.status(200).json(getDetail.data);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+})
+
 if (process.env.NODE_ENV === 'production') {
     const options = {
         key: fs.readFileSync(process.env.SSL_PRIVATE_KEY_PATH),

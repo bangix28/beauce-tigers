@@ -111,6 +111,52 @@ h1, h2, h3, h4, h5, h6 {
     @apply translate-x-full;
 }
 
+/* Carte Hextech : cadre or, lueur turquoise, coins ornés (page détail de match) */
+.hextech-card {
+    @apply relative bg-lol-darker/80 border border-lol-gold/40 p-5 rounded-sm;
+    background-image: radial-gradient(ellipse at top, rgba(10, 200, 185, 0.05), transparent 60%);
+}
+
+.hextech-card::before,
+.hextech-card::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-color: var(--color-lol-gold);
+    border-style: solid;
+    pointer-events: none;
+}
+
+.hextech-card::before {
+    top: -1px;
+    left: -1px;
+    border-width: 2px 0 0 2px;
+}
+
+.hextech-card::after {
+    bottom: -1px;
+    right: -1px;
+    border-width: 0 2px 2px 0;
+}
+
+/* Titre de section Hextech : Beaufort, losange turquoise en préfixe */
+.hextech-title {
+    @apply text-lol-gold uppercase tracking-[0.2em] text-sm mb-4;
+    font-family: var(--font-beaufort);
+}
+
+.hextech-title::before {
+    content: '◆ ';
+    color: var(--color-lol-blue);
+}
+
+/* Liseré or dégradé (haut/bas de la bannière du match) */
+.hextech-divider {
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #C8AA6E, transparent);
+}
+
 /* Support tactile */
 @media (hover: none) {
     .btn:active,

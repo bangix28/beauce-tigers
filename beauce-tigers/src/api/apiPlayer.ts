@@ -15,6 +15,14 @@ export const playerDataAPI = {
     const response = await apiClient.get(formattedUrl);
 
     return response.data;
+  },
+
+  getMatchDetail: async (id: number) => {
+    const urlTemplate = import.meta.env.VITE_RIOT_MATCH_DETAIL_URL;
+    const formattedUrl = urlTemplate.replace(':id', String(id));
+    const response = await apiClient.get(formattedUrl);
+
+    return response.data;
   }
 
 };

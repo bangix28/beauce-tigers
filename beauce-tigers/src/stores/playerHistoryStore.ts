@@ -33,7 +33,12 @@ export const usePlayerHistoryStore = defineStore('playerHistory', () => {
       deaths: item.deathPlayer,
       kill: item.killPlayer,
       creepScore: item.creepScore ?? null,
-      visionScore: item.visionScore ?? null
+      visionScore: item.visionScore ?? null,
+      kda: item.kda ?? null,
+      killParticipation: item.killParticipation ?? null,
+      damagePerMinute: item.damagePerMinute ?? null,
+      goldPerMinute: item.goldPerMinute ?? null,
+      visionScorePerMinute: item.visionScorePerMinute ?? null
     }))
 
     historiesById.value[id] = list
