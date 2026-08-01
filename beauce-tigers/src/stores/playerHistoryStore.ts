@@ -4,20 +4,29 @@ import { PlayerHistory } from '../../types/playerHistory'
 import { playerDataAPI } from '@/api/apiPlayer'
 import { isCacheFresh } from '@/utils/cache'
 
+// Taille demandée par la page compte ; sans param, le défaut serveur (5) s'applique
+export const ACCOUNT_HISTORY_COUNT = 10
+
 export const usePlayerHistoryStore = defineStore('playerHistory', () => {
   const PlayerHistoryData = ref<PlayerHistory[]>([])
+  // Dernière liste connue par compte, toutes tailles confondues (radar de la page match)
   const historiesById = ref<Record<number, PlayerHistory[]>>({})
-  const historyFetchedAtById = ref<Record<number, number>>({})
+  // Cache par compte ET par taille demandée : la page compte (10) ne doit pas
+  // resservir les 5 mis en cache par l'accueil, ni l'inverse
+  const historiesByKey = ref<Record<string, PlayerHistory[]>>({})
+  const historyFetchedAtByKey = ref<Record<string, number>>({})
 
-  const fetchListPlayerHistoryData = async (id: number) => {
-    const cached = historiesById.value[id]
+  const fetchListPlayerHistoryData = async (id: number, itemsPerPage?: number) => {
+    const key = `${id}:${itemsPerPage ?? 'default'}`
+    const cached = historiesByKey.value[key]
 
-    if (cached && isCacheFresh(historyFetchedAtById.value[id])) {
+    if (cached && isCacheFresh(historyFetchedAtByKey.value[key])) {
       PlayerHistoryData.value = cached
+      historiesById.value[id] = cached
       return
     }
 
-    const data = await playerDataAPI.getAllHistory(id)
+    const data = await playerDataAPI.getAllHistory(id, itemsPerPage)
 
     const list: PlayerHistory[] = data.member.map((item: any) => ({
       id: item.id,
@@ -39,8 +48,9 @@ export const usePlayerHistoryStore = defineStore('playerHistory', () => {
       visionScorePerMinute: item.visionScorePerMinute ?? null
     }))
 
+    historiesByKey.value[key] = list
+    historyFetchedAtByKey.value[key] = Date.now()
     historiesById.value[id] = list
-    historyFetchedAtById.value[id] = Date.now()
     PlayerHistoryData.value = list
   }
 
@@ -48,6 +58,7 @@ export const usePlayerHistoryStore = defineStore('playerHistory', () => {
     fetchListPlayerHistoryData,
     PlayerHistoryData,
     historiesById,
-    historyFetchedAtById
+    historiesByKey,
+    historyFetchedAtByKey
   }
 })

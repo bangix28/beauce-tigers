@@ -23,7 +23,12 @@
                    :src="getUrlIconSummoner(playerData.logoId)">
               <div>
                 <div class="flex items-center gap-1.5">
-                  <div class="font-bold text-white">{{ playerData.name }}</div>
+                  <!-- @click.stop : le lien navigue vers la page compte sans déplier l'historique inline -->
+                  <router-link
+                    :to="{ name: 'AccountDetails', params: { id: playerData.id } }"
+                    class="font-bold text-white hover:text-lol-gold transition-colors"
+                    @click.stop
+                  >{{ playerData.name }}</router-link>
                   <span v-if="playerData.soloHotStreak" title="Série de victoires en cours">
                     <Flame class="w-3.5 h-3.5 text-orange-400" />
                   </span>
@@ -99,7 +104,12 @@
                  :src="getUrlIconSummoner(playerData.logoId)">
             <div>
               <div class="flex items-center gap-1.5">
-                <div class="font-extrabold text-white text-base">{{ playerData.name }}</div>
+                <!-- @click.stop : le lien navigue vers la page compte sans déplier l'historique inline -->
+                <router-link
+                  :to="{ name: 'AccountDetails', params: { id: playerData.id } }"
+                  class="font-extrabold text-white text-base hover:text-lol-gold transition-colors"
+                  @click.stop
+                >{{ playerData.name }}</router-link>
                 <span v-if="playerData.soloHotStreak" title="Série de victoires en cours">
                   <Flame class="w-4 h-4 text-orange-400" />
                 </span>
@@ -152,6 +162,7 @@
 <script>
 import {utilsTools} from "@/mixins/utilsTools.js";
 import PlayerDetails from "@/components/PlayerDetails.vue";
+import { getTierColorClass } from '@/utils/rank';
 import { Flame, Medal, Sparkles } from 'lucide-vue-next';
 export default {
   name: 'RowDashboard',
@@ -195,19 +206,8 @@ export default {
       return !tier || tier === 'UNRANKED';
     },
     tierColorClass() {
-      const colors = {
-        IRON: 'text-zinc-400',
-        BRONZE: 'text-amber-600',
-        SILVER: 'text-slate-300',
-        GOLD: 'text-yellow-400',
-        PLATINUM: 'text-teal-300',
-        EMERALD: 'text-emerald-400',
-        DIAMOND: 'text-blue-300',
-        MASTER: 'text-purple-400',
-        GRANDMASTER: 'text-red-400',
-        CHALLENGER: 'text-cyan-300',
-      };
-      return colors[this.playerData.rankedSoloTiers] || 'text-gray-300';
+      // Source unique des couleurs de tier, partagée avec la page compte
+      return getTierColorClass(this.playerData.rankedSoloTiers);
     },
     miniSeriesSlots() {
       const p = this.playerData;

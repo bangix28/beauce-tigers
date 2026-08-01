@@ -9,10 +9,13 @@ export const playerDataAPI = {
     return response.data;
   },
 
-  getAllHistory: async (id: number) => {
+  getAllHistory: async (id: number, itemsPerPage?: number) => {
     const urlTemplate = import.meta.env.VITE_RIOT_HISTORY_URL;
     const formattedUrl = urlTemplate.replace(':id', String(id));
-    const response = await apiClient.get(formattedUrl);
+    const response = await apiClient.get(formattedUrl, {
+      // Sans param : le défaut serveur (5) s'applique ; la page compte demande 10
+      params: itemsPerPage != null ? { itemsPerPage } : undefined
+    });
 
     return response.data;
   },
@@ -21,6 +24,28 @@ export const playerDataAPI = {
     const urlTemplate = import.meta.env.VITE_RIOT_MATCH_DETAIL_URL;
     if (!urlTemplate) {
       throw new Error('VITE_RIOT_MATCH_DETAIL_URL manquante dans le .env (voir .env.template)');
+    }
+    const formattedUrl = urlTemplate.replace(':id', String(id));
+    const response = await apiClient.get(formattedUrl);
+
+    return response.data;
+  },
+
+  getAccountDetail: async (id: number) => {
+    const urlTemplate = import.meta.env.VITE_RIOT_ACCOUNT_DETAIL_URL;
+    if (!urlTemplate) {
+      throw new Error('VITE_RIOT_ACCOUNT_DETAIL_URL manquante dans le .env (voir .env.template)');
+    }
+    const formattedUrl = urlTemplate.replace(':id', String(id));
+    const response = await apiClient.get(formattedUrl);
+
+    return response.data;
+  },
+
+  getEloDaily: async (id: number) => {
+    const urlTemplate = import.meta.env.VITE_RIOT_ELO_DAILY_URL;
+    if (!urlTemplate) {
+      throw new Error('VITE_RIOT_ELO_DAILY_URL manquante dans le .env (voir .env.template)');
     }
     const formattedUrl = urlTemplate.replace(':id', String(id));
     const response = await apiClient.get(formattedUrl);

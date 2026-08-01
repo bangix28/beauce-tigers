@@ -35,15 +35,41 @@ app.get('/api/riot-account', async (req, res) => {
     }
 });
 
+app.get('/api/riot-account/account/:id', async (req, res) => {
+    try {
+        if (!/^\d+$/.test(req.params.id)) {
+            return res.status(404).json({ error: 'Compte introuvable' });
+        }
+
+        let url = process.env.URL_API_BEAUCE + process.env.URL_ENDPOINT_GET_ACCOUNT;
+
+        let regex = /\{id}/;
+        let newUrl = url.replace(regex, req.params.id);
+
+        const token = await new RouteurApi().authWebServices();
+        const getAccount = await new RouteurApi().callApi(token, newUrl);
+
+        res.status(200).json(getAccount.data);
+    } catch (error) {
+        if (error.response?.status === 404) {
+            return res.status(404).json({ error: 'Compte introuvable' });
+        }
+        res.status(500).json({ error: error.message });
+    }
+})
+
 app.get('/api/riot-account/account/:id/collection/history', async (req, res) => {
     try {
-        // L'id est interpolé dans l'URL amont : on refuse tout ce qui n'est pas
-        // un entier pour bloquer un path traversal (ex: 1%2F..%2F..%2Fautre-route)
         if (!/^\d+$/.test(req.params.id)) {
             return res.status(404).json({ error: 'Compte introuvable' });
         }
 
         let url = process.env.URL_API_BEAUCE + process.env.URL_ENDPOINT_GET_LIST_HISTORY_ACCOUNT + '?page=1';
+
+        if (/^\d+$/.test(req.query.itemsPerPage ?? '')) {
+            url += '&itemsPerPage=' + req.query.itemsPerPage;
+        }
+
         const accountId = req.params.id;
 
         let regex = /\{id}/;
@@ -54,6 +80,31 @@ app.get('/api/riot-account/account/:id/collection/history', async (req, res) => 
 
         res.status(200).json(getHistoryLol.data);
     } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+})
+
+app.get('/api/riot-account/account/:id/collection/elo-daily', async (req, res) => {
+    try {
+        // L'id est interpolé dans l'URL amont : on refuse tout ce qui n'est pas
+        // un entier pour bloquer un path traversal (ex: 1%2F..%2F..%2Fautre-route)
+        if (!/^\d+$/.test(req.params.id)) {
+            return res.status(404).json({ error: 'Compte introuvable' });
+        }
+
+        let url = process.env.URL_API_BEAUCE + process.env.URL_ENDPOINT_GET_ELO_DAILY;
+
+        let regex = /\{id}/;
+        let newUrl = url.replace(regex, req.params.id);
+
+        const token = await new RouteurApi().authWebServices();
+        const getEloDaily = await new RouteurApi().callApi(token, newUrl);
+
+        res.status(200).json(getEloDaily.data);
+    } catch (error) {
+        if (error.response?.status === 404) {
+            return res.status(404).json({ error: 'Compte introuvable' });
+        }
         res.status(500).json({ error: error.message });
     }
 })
