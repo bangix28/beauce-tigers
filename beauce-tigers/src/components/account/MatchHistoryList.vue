@@ -33,11 +33,13 @@ export default {
   methods: {
     goToMatch(history) {
       // accountId/player en query : ils survivent au F5 et au partage d'URL,
-      // contrairement à un state de store (accountId sert au radar vs moyennes)
+      // contrairement à un state de store (accountId sert au radar vs moyennes).
+      // from=account : le bouton retour de la page match ramène ici plutôt
+      // qu'au classement (le carrousel de l'accueil n'envoie pas ce flag)
       this.$router.push({
         name: 'MatchDetails',
         params: { id: history.id },
-        query: { accountId: this.accountId, player: this.accountName }
+        query: { accountId: this.accountId, player: this.accountName, from: 'account' }
       })
     }
   }
