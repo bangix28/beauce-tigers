@@ -44,6 +44,8 @@ export default {
           {
             data: this.deltas.map((d) => d.value),
             backgroundColor: this.deltas.map((d) => (d.value >= 0 ? LOL_GREEN + 'b3' : LOL_RED + 'b3')),
+            // Couleur pleine au survol : la barre visée ressort
+            hoverBackgroundColor: this.deltas.map((d) => (d.value >= 0 ? LOL_GREEN : LOL_RED)),
             borderColor: this.deltas.map((d) => (d.value >= 0 ? LOL_GREEN : LOL_RED)),
             borderWidth: 1,
             borderRadius: 2,

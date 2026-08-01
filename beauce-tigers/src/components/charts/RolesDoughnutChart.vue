@@ -59,7 +59,9 @@ export default {
             backgroundColor: this.roleCounts.map((r) => ROLE_COLORS[r.role] ?? '#9ca3af'),
             // Liseré sombre entre les parts (couleur de fond des cartes)
             borderColor: '#0A1428',
-            borderWidth: 2
+            borderWidth: 2,
+            // La part survolée se détache du doughnut
+            hoverOffset: 10
           }
         ]
       }
@@ -69,6 +71,8 @@ export default {
         cutout: '65%',
         responsive: true,
         maintainAspectRatio: false,
+        // Marge interne : la part détachée (hoverOffset) ne doit pas être rognée
+        layout: { padding: 8 },
         plugins: {
           legend: {
             display: true,

@@ -5,16 +5,16 @@
       <KillParticipationGauge :value="winRatio" label="Winrate" />
 
       <div class="flex flex-col items-center sm:items-start gap-3">
-        <!-- Série V/D chronologique (gauche = plus ancien) -->
-        <div
-          class="flex items-center gap-1.5"
-          :title="`${wins} victoire(s), ${histories.length - wins} défaite(s)`"
-        >
+        <!-- Série V/D chronologique (gauche = plus ancien), apparition en cascade,
+             détail du match correspondant au survol de chaque pastille -->
+        <div class="flex items-center gap-1.5">
           <span
-            v-for="(win, i) in chronologicalResults"
+            v-for="(match, i) in chronologicalResults"
             :key="i"
-            class="w-2.5 h-2.5 rounded-full"
-            :class="win ? 'bg-green-400' : 'bg-red-400'"
+            class="w-2.5 h-2.5 rounded-full opacity-0 animate-fade-in cursor-help transition-transform hover:scale-150"
+            :class="match.win ? 'bg-green-400' : 'bg-red-400'"
+            :style="{ animationDelay: `${i * 60}ms` }"
+            :title="dotTitle(match)"
           ></span>
         </div>
 
@@ -32,7 +32,13 @@
     </div>
 
     <div v-if="statTiles.length" class="grid grid-cols-2 gap-3 mt-6">
-      <StatTile v-for="tile in statTiles" :key="tile.label" :label="tile.label" :value="tile.value" />
+      <StatTile
+        v-for="tile in statTiles"
+        :key="tile.label"
+        :label="tile.label"
+        :value="tile.value"
+        :explanation="tile.explanation"
+      />
     </div>
   </div>
   <p v-else class="text-sm text-gray-500 text-center py-6">Aucun historique disponible.</p>
@@ -40,6 +46,7 @@
 
 <script>
 import { useKDAFormatter } from '@/composables/useKdaFormatter'
+import { utilsTools } from '@/mixins/utilsTools.js'
 import KillParticipationGauge from '@/components/charts/KillParticipationGauge.vue'
 import StatTile from '@/components/charts/StatTile.vue'
 
@@ -60,8 +67,20 @@ export default {
       default: () => []
     }
   },
+  mixins: [utilsTools],
   created() {
     this.kdaFormatter = useKDAFormatter()
+  },
+  methods: {
+    // Détail du match derrière une pastille : "Victoire · Ahri · 12/3/9 · 28/07/2026"
+    dotTitle(match) {
+      const parts = [match.win ? 'Victoire' : 'Défaite']
+      if (match.championName) parts.push(match.championName)
+      parts.push(`${match.kill}/${match.deaths}/${match.assist}`)
+      const date = this.formatDate(match.dateGameEnd)
+      if (date) parts.push(date)
+      return parts.join(' · ')
+    }
   },
   computed: {
     wins() {
@@ -72,7 +91,7 @@ export default {
     },
     chronologicalResults() {
       // La liste arrive DESC : on l'inverse pour lire la forme de gauche à droite
-      return this.histories.map((h) => h.win).reverse()
+      return [...this.histories].reverse()
     },
     kdaFormat() {
       // Moyennes par match (1 décimale) ; le ratio agrégé (somme K+A / somme D)
@@ -91,22 +110,42 @@ export default {
       const totalMinutes = withCs.reduce((acc, h) => acc + h.gameDuration, 0)
       if (totalMinutes > 0) {
         const totalCs = withCs.reduce((acc, h) => acc + h.creepScore, 0)
-        tiles.push({ label: 'CS / min', value: (totalCs / totalMinutes).toFixed(1) })
+        tiles.push({
+          label: 'CS / min',
+          value: (totalCs / totalMinutes).toFixed(1),
+          explanation:
+            'Sbires et monstres de la jungle tués par minute, calculé sur le total des derniers matchs (somme des CS divisée par la somme des durées).'
+        })
       }
 
       const damage = avgOf(this.histories.map((h) => h.damagePerMinute))
       if (damage != null) {
-        tiles.push({ label: 'Dégâts / min', value: Math.round(damage).toLocaleString('fr-FR') })
+        tiles.push({
+          label: 'Dégâts / min',
+          value: Math.round(damage).toLocaleString('fr-FR'),
+          explanation:
+            'Dégâts infligés aux champions ennemis par minute, en moyenne sur les matchs où la statistique est disponible.'
+        })
       }
 
       const gold = avgOf(this.histories.map((h) => h.goldPerMinute))
       if (gold != null) {
-        tiles.push({ label: 'Or / min', value: Math.round(gold).toLocaleString('fr-FR') })
+        tiles.push({
+          label: 'Or / min',
+          value: Math.round(gold).toLocaleString('fr-FR'),
+          explanation:
+            "Or gagné par minute (sbires, kills, objectifs, revenu passif), en moyenne sur les matchs où la statistique est disponible."
+        })
       }
 
       const vision = avgOf(this.histories.map((h) => h.visionScorePerMinute))
       if (vision != null) {
-        tiles.push({ label: 'Vision / min', value: vision.toFixed(2) })
+        tiles.push({
+          label: 'Vision / min',
+          value: vision.toFixed(2),
+          explanation:
+            'Score de vision par minute : balises posées, détruites et vision utile apportée à l’équipe.'
+        })
       }
 
       return tiles
