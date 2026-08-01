@@ -3,7 +3,7 @@
     <Bar :data="chartData" :options="chartOptions" />
   </div>
   <p v-else class="text-sm text-gray-500 text-center py-6">
-    Pas assez de données sur cette période.
+    Pas assez de relevés sur deux jours consécutifs sur cette période.
   </p>
 </template>
 
@@ -26,13 +26,16 @@ export default {
   },
   computed: {
     deltas() {
-      // Variation entre deux relevés consécutifs. Un trou dans les données
-      // (bot down un jour) fait porter au delta plusieurs jours — assumé,
-      // cohérent avec l'axe CategoryScale non linéaire de la courbe
-      return this.points.slice(1).map((p, i) => ({
-        label: this.formatDate(p.date, 'dd/MM'),
-        value: p.score - this.points[i].score
-      }))
+      // Variation entre deux relevés espacés d'exactement un jour. Un trou dans
+      // les données (bot down) produirait une fausse barre "journalière" portant
+      // des semaines de progression (ex: +617 LP sur 3 mois) : on l'écarte
+      const DAY_MS = 24 * 60 * 60 * 1000
+      return this.points.slice(1).flatMap((p, i) => {
+        const prev = this.points[i]
+        const gapDays = Math.round((new Date(p.date) - new Date(prev.date)) / DAY_MS)
+        if (gapDays > 1) return []
+        return [{ label: this.formatDate(p.date, 'dd/MM'), value: p.score - prev.score }]
+      })
     },
     chartData() {
       return {
