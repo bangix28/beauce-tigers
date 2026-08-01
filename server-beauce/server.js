@@ -23,7 +23,12 @@ if (fs.existsSync(envFile)) {
 app.use(express.json());
 app.use(cors());
 
-app.get('/api/riot-account', async (req, res) => {
+// Toutes les routes sont déclarées sans préfixe sur ce router, monté plus bas
+// sur API_PREFIX : '/api' par défaut (appel direct du front en local), '' en
+// production derrière le reverse proxy qui retire déjà le segment /api
+const apiRouter = express.Router();
+
+apiRouter.get('/riot-account', async (req, res) => {
     try {
         const token = await new RouteurApi().authWebServices()
         let url = process.env.URL_API_BEAUCE + process.env.URL_ENDPOINT_RANKED;
@@ -35,7 +40,7 @@ app.get('/api/riot-account', async (req, res) => {
     }
 });
 
-app.get('/api/riot-account/account/:id', async (req, res) => {
+apiRouter.get('/riot-account/account/:id', async (req, res) => {
     try {
         if (!/^\d+$/.test(req.params.id)) {
             return res.status(404).json({ error: 'Compte introuvable' });
@@ -58,7 +63,7 @@ app.get('/api/riot-account/account/:id', async (req, res) => {
     }
 })
 
-app.get('/api/riot-account/account/:id/collection/history', async (req, res) => {
+apiRouter.get('/riot-account/account/:id/collection/history', async (req, res) => {
     try {
         if (!/^\d+$/.test(req.params.id)) {
             return res.status(404).json({ error: 'Compte introuvable' });
@@ -84,7 +89,7 @@ app.get('/api/riot-account/account/:id/collection/history', async (req, res) => 
     }
 })
 
-app.get('/api/riot-account/account/:id/collection/elo-daily', async (req, res) => {
+apiRouter.get('/riot-account/account/:id/collection/elo-daily', async (req, res) => {
     try {
         // L'id est interpolé dans l'URL amont : on refuse tout ce qui n'est pas
         // un entier pour bloquer un path traversal (ex: 1%2F..%2F..%2Fautre-route)
@@ -109,7 +114,7 @@ app.get('/api/riot-account/account/:id/collection/elo-daily', async (req, res) =
     }
 })
 
-app.get('/api/history-account-lol/:id', async (req, res) => {
+apiRouter.get('/history-account-lol/:id', async (req, res) => {
     try {
         // L'id est interpolé dans l'URL amont : on refuse tout ce qui n'est pas
         // un entier pour bloquer un path traversal (ex: 1%2F..%2F..%2Fautre-route)
@@ -135,6 +140,12 @@ app.get('/api/history-account-lol/:id', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 })
+
+// ?? et pas || : API_PREFIX= (chaîne vide) est un choix valide qui signifie
+// "pas de préfixe" (prod derrière reverse proxy), alors qu'une variable
+// absente retombe sur /api (local)
+const API_PREFIX = process.env.API_PREFIX ?? '/api';
+app.use(API_PREFIX || '/', apiRouter);
 
 if (process.env.NODE_ENV === 'production') {
     const options = {
