@@ -3,11 +3,12 @@
     <div
       v-for="champ in championStats"
       :key="champ.championId"
-      class="flex items-center gap-3 p-2 bg-gray-800/50 rounded"
+      class="group flex items-center gap-3 p-2 bg-gray-800/50 hover:bg-gray-800 rounded cursor-help transition-colors duration-200"
+      :title="`K/D/A moyen : ${(champ.sumKill / champ.games).toFixed(1)} / ${(champ.sumDeaths / champ.games).toFixed(1)} / ${(champ.sumAssist / champ.games).toFixed(1)}`"
     >
       <img
         alt="Icône du Champion"
-        class="w-10 h-10 rounded-full border border-lol-gold flex-shrink-0"
+        class="w-10 h-10 rounded-full border border-lol-gold flex-shrink-0 transition-transform duration-200 group-hover:scale-110"
         :src="getUrlIconChampion(champ.championId)"
       />
       <div class="flex-1 min-w-0">

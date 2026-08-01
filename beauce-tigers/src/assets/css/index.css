@@ -129,6 +129,13 @@ h1, h2, h3, h4, h5, h6 {
 .hextech-card {
     @apply relative bg-lol-darker/80 border border-lol-gold/40 p-5 rounded-sm;
     background-image: radial-gradient(ellipse at top, rgba(10, 200, 185, 0.05), transparent 60%);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Au survol la carte s'illumine et ses coins ornés s'étendent */
+.hextech-card:hover {
+    border-color: rgba(200, 170, 110, 0.7);
+    box-shadow: 0 0 16px rgba(200, 170, 110, 0.08);
 }
 
 .hextech-card::before,
@@ -140,6 +147,13 @@ h1, h2, h3, h4, h5, h6 {
     border-color: var(--color-lol-gold);
     border-style: solid;
     pointer-events: none;
+    transition: width 0.3s ease, height 0.3s ease;
+}
+
+.hextech-card:hover::before,
+.hextech-card:hover::after {
+    width: 18px;
+    height: 18px;
 }
 
 .hextech-card::before {
