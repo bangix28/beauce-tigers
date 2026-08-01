@@ -36,6 +36,20 @@ body {
     font-family: 'Spiegel', sans-serif;
 }
 
+/* Couleurs KDA (globales : injectées via v-html, hors de portée des styles scoped) */
+.text-lol-perfect {
+    color: #fcc419;
+}
+.text-lol-excellent {
+    color: #81c784;
+}
+.text-lol-good {
+    color: #ffee58;
+}
+.text-lol-poor {
+    color: #ef5350;
+}
+
 h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-beaufort), serif;
 }

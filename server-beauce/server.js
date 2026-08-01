@@ -37,6 +37,12 @@ app.get('/api/riot-account', async (req, res) => {
 
 app.get('/api/riot-account/account/:id/collection/history', async (req, res) => {
     try {
+        // L'id est interpolé dans l'URL amont : on refuse tout ce qui n'est pas
+        // un entier pour bloquer un path traversal (ex: 1%2F..%2F..%2Fautre-route)
+        if (!/^\d+$/.test(req.params.id)) {
+            return res.status(404).json({ error: 'Compte introuvable' });
+        }
+
         let url = process.env.URL_API_BEAUCE + process.env.URL_ENDPOINT_GET_LIST_HISTORY_ACCOUNT + '?page=1';
         const accountId = req.params.id;
 
@@ -54,6 +60,12 @@ app.get('/api/riot-account/account/:id/collection/history', async (req, res) => 
 
 app.get('/api/history-account-lol/:id', async (req, res) => {
     try {
+        // L'id est interpolé dans l'URL amont : on refuse tout ce qui n'est pas
+        // un entier pour bloquer un path traversal (ex: 1%2F..%2F..%2Fautre-route)
+        if (!/^\d+$/.test(req.params.id)) {
+            return res.status(404).json({ error: 'Match introuvable' });
+        }
+
         let url = process.env.URL_API_BEAUCE + process.env.URL_ENDPOINT_GET_DETAIL_HISTORY;
 
         let regex = /\{id}/;
@@ -62,14 +74,13 @@ app.get('/api/history-account-lol/:id', async (req, res) => {
         const token = await new RouteurApi().authWebServices();
         const getDetail = await new RouteurApi().callApi(token, newUrl);
 
-        // callApi avale les erreurs et retourne undefined (404 Symfony inclus) :
-        // sans ce check, getDetail.data lèverait un TypeError → 500 générique
-        if (!getDetail) {
-            return res.status(404).json({ error: 'Match introuvable' });
-        }
-
         res.status(200).json(getDetail.data);
     } catch (error) {
+        // Seul un vrai 404 amont signifie "match inexistant" ; toute autre
+        // erreur (panne, auth, env manquante) reste un 500 réessayable côté front
+        if (error.response?.status === 404) {
+            return res.status(404).json({ error: 'Match introuvable' });
+        }
         res.status(500).json({ error: error.message });
     }
 })

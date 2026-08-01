@@ -11,6 +11,7 @@ class RouteurApi {
             return response.data;
         } catch (error) {
             console.error(`Error: ${error}`);
+            throw error;
         }
     }
 
@@ -25,6 +26,7 @@ class RouteurApi {
             return await axios.get(url,config);
         } catch (error) {
             console.error(`Error: ${error}`);
+            throw error;
         }
     }
 }

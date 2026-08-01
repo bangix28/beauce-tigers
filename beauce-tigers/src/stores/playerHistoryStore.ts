@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { PlayerHistory } from '../../types/playerHistory'
 import { playerDataAPI } from '@/api/apiPlayer'
+import { isCacheFresh } from '@/utils/cache'
 
 export const usePlayerHistoryStore = defineStore('playerHistory', () => {
   const PlayerHistoryData = ref<PlayerHistory[]>([])
@@ -9,12 +10,9 @@ export const usePlayerHistoryStore = defineStore('playerHistory', () => {
   const historyFetchedAtById = ref<Record<number, number>>({})
 
   const fetchListPlayerHistoryData = async (id: number) => {
-    const now = Date.now()
     const cached = historiesById.value[id]
-    const fetchedAt = historyFetchedAtById.value[id]
-    const FIFTEEN_MIN = 30 * 60 * 1000
 
-    if (cached && fetchedAt && now - fetchedAt < FIFTEEN_MIN) {
+    if (cached && isCacheFresh(historyFetchedAtById.value[id])) {
       PlayerHistoryData.value = cached
       return
     }
@@ -42,7 +40,7 @@ export const usePlayerHistoryStore = defineStore('playerHistory', () => {
     }))
 
     historiesById.value[id] = list
-    historyFetchedAtById.value[id] = now
+    historyFetchedAtById.value[id] = Date.now()
     PlayerHistoryData.value = list
   }
 

@@ -10,25 +10,7 @@
     </button>
 
     <!-- Chargement -->
-    <div v-if="loading" class="flex flex-col items-center justify-center text-xs text-gray-500 py-24">
-      <svg
-        aria-hidden="true"
-        class="w-8 mt-2 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
-        viewBox="0 0 100 101"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-          fill="currentColor"
-        />
-        <path
-          d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-          fill="currentFill"
-        />
-      </svg>
-      <p class="my-4">{{ randomLoadingMessage(loading, loadingMessage) }}</p>
-    </div>
+    <LoadingSpinner v-if="loading" class="py-24" />
 
     <!-- Match introuvable / id invalide -->
     <div v-else-if="notFound" class="flex flex-col items-center justify-center py-24 gap-4">
@@ -130,22 +112,12 @@
         <h2 class="hextech-title">Build</h2>
 
         <div v-if="hasBuild" class="flex flex-col md:flex-row md:items-center gap-8">
-          <!-- Items -->
+          <!-- Items (tooltip Hextech au survol, comme en jeu) -->
           <div class="flex items-center gap-1.5">
             <template v-for="(item, idx) in match.items" :key="idx">
               <!-- Divider avant le trinket (7e slot) -->
               <div v-if="idx === 6" class="w-px h-10 bg-lol-gold/40 mx-2"></div>
-              <div
-                class="w-12 h-12 border border-lol-gold/50 bg-lol-darker rounded-sm overflow-hidden"
-                :class="{ 'empty-slot': item == null || assetStore.getItemIconUrl(item) == null }"
-              >
-                <img
-                  v-if="item != null && assetStore.getItemIconUrl(item) != null"
-                  :src="assetStore.getItemIconUrl(item)"
-                  :alt="`Item ${item}`"
-                  class="w-full h-full object-cover"
-                />
-              </div>
+              <ItemSlot :item-id="item" />
             </template>
           </div>
 
@@ -155,55 +127,76 @@
               v-for="(spellId, sIdx) in [match.summonerSpell1Id, match.summonerSpell2Id]"
               :key="sIdx"
             >
-              <div
+              <HextechTooltip
                 v-if="spellId != null && assetStore.getSummonerSpellIconUrl(spellId) != null"
-                class="w-10 h-10 border border-lol-gold/50 bg-lol-darker rounded-sm overflow-hidden"
+                :title="assetStore.getSummonerSpellInfo(spellId)?.name"
+                :meta="spellCooldownLabel(spellId)"
+                :description="assetStore.getSummonerSpellInfo(spellId)?.description"
               >
-                <img
-                  :src="assetStore.getSummonerSpellIconUrl(spellId)"
-                  :alt="`Sort d'invocateur ${spellId}`"
-                  class="w-full h-full object-cover"
-                />
-              </div>
+                <span
+                  class="block w-10 h-10 border border-lol-gold/50 bg-lol-darker rounded-sm overflow-hidden"
+                >
+                  <img
+                    :src="assetStore.getSummonerSpellIconUrl(spellId)"
+                    :alt="assetStore.getSummonerSpellInfo(spellId)?.name ?? `Sort ${spellId}`"
+                    class="w-full h-full object-cover"
+                  />
+                </span>
+              </HextechTooltip>
             </template>
           </div>
 
           <!-- Runes -->
           <div v-if="match.runeKeystoneId != null" class="flex items-center gap-4">
-            <div class="relative">
+            <HextechTooltip
+              :title="assetStore.getPerkInfo(match.runeKeystoneId)?.name"
+              :description="assetStore.getPerkInfo(match.runeKeystoneId)?.description"
+            >
               <img
                 v-if="assetStore.getPerkIconUrl(match.runeKeystoneId) != null"
                 :src="assetStore.getPerkIconUrl(match.runeKeystoneId)"
-                alt="Rune principale"
+                :alt="assetStore.getPerkInfo(match.runeKeystoneId)?.name ?? 'Rune principale'"
                 class="w-14 h-14 rounded-full border-2 border-lol-gold keystone-glow bg-lol-darker"
               />
-            </div>
+            </HextechTooltip>
             <div class="flex flex-col gap-2">
               <div class="flex gap-2">
-                <img
-                  v-if="assetStore.getPerkStyleIconUrl(match.runePrimaryStyleId) != null"
-                  :src="assetStore.getPerkStyleIconUrl(match.runePrimaryStyleId)"
-                  alt="Style principal"
-                  class="w-7 h-7"
-                />
-                <img
-                  v-if="assetStore.getPerkStyleIconUrl(match.runeSubStyleId) != null"
-                  :src="assetStore.getPerkStyleIconUrl(match.runeSubStyleId)"
-                  alt="Style secondaire"
-                  class="w-7 h-7 opacity-80"
-                />
+                <template
+                  v-for="(styleId, styIdx) in [match.runePrimaryStyleId, match.runeSubStyleId]"
+                  :key="styIdx"
+                >
+                  <HextechTooltip
+                    v-if="assetStore.getPerkStyleIconUrl(styleId) != null"
+                    :title="assetStore.getPerkStyleInfo(styleId)?.name"
+                    :meta="styIdx === 0 ? 'Style principal' : 'Style secondaire'"
+                    :description="assetStore.getPerkStyleInfo(styleId)?.description"
+                  >
+                    <img
+                      :src="assetStore.getPerkStyleIconUrl(styleId)"
+                      :alt="assetStore.getPerkStyleInfo(styleId)?.name ?? 'Style de runes'"
+                      class="w-7 h-7"
+                      :class="{ 'opacity-80': styIdx === 1 }"
+                    />
+                  </HextechTooltip>
+                </template>
               </div>
               <div class="flex gap-2">
                 <template
                   v-for="(statId, stIdx) in [match.runeStatOffense, match.runeStatFlex, match.runeStatDefense]"
                   :key="stIdx"
                 >
-                  <img
+                  <HextechTooltip
                     v-if="statId != null && assetStore.getPerkIconUrl(statId) != null"
-                    :src="assetStore.getPerkIconUrl(statId)"
-                    :alt="`Fragment ${statId}`"
-                    class="w-[22px] h-[22px] rounded-full border border-gray-600 bg-lol-darker"
-                  />
+                    :title="assetStore.getPerkInfo(statId)?.name"
+                    meta="Fragment"
+                    :description="assetStore.getPerkInfo(statId)?.description"
+                  >
+                    <img
+                      :src="assetStore.getPerkIconUrl(statId)"
+                      :alt="assetStore.getPerkInfo(statId)?.name ?? `Fragment ${statId}`"
+                      class="w-[22px] h-[22px] rounded-full border border-gray-600 bg-lol-darker"
+                    />
+                  </HextechTooltip>
                 </template>
               </div>
             </div>
@@ -250,7 +243,7 @@
         <!-- Radar vs moyennes -->
         <div v-if="radarAxes.length >= 3" class="hextech-card animate-fade-in" style="animation-delay: 0.4s">
           <h2 class="hextech-title">Performance vs moyennes</h2>
-          <MatchRadarChart :axes="radarAxes" />
+          <MatchRadarChart :axes="radarAxes" :avg-label="radarAvgLabel" />
         </div>
 
         <!-- Économie & tempo -->
@@ -267,12 +260,14 @@
 
 <script>
 import { utilsTools } from '@/mixins/utilsTools.js'
-import { LOADING_MESSAGES } from '@/assets/loadingMessages.js'
 import { useKDAFormatter } from '@/composables/useKdaFormatter'
 import { useMatchDetailStore } from '@/stores/matchDetailStore'
 import { useAssetCatalogStore } from '@/stores/assetCatalogStore'
 import { usePlayerHistoryStore } from '@/stores/playerHistoryStore'
 import { ArrowLeft, SearchX } from 'lucide-vue-next'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import ItemSlot from '@/components/ItemSlot.vue'
+import HextechTooltip from '@/components/HextechTooltip.vue'
 import DamageBarChart from '@/components/charts/DamageBarChart.vue'
 import KillParticipationGauge from '@/components/charts/KillParticipationGauge.vue'
 import MatchRadarChart from '@/components/charts/MatchRadarChart.vue'
@@ -292,6 +287,9 @@ export default {
   components: {
     ArrowLeft,
     SearchX,
+    LoadingSpinner,
+    ItemSlot,
+    HextechTooltip,
     DamageBarChart,
     KillParticipationGauge,
     MatchRadarChart,
@@ -307,30 +305,48 @@ export default {
   data() {
     return {
       loading: false,
-      invalidId: false,
-      loadingMessage: LOADING_MESSAGES
+      invalidId: false
     }
   },
   async mounted() {
-    const id = Number(this.$route.params.id)
-    // Id non numérique (/match/abc) : écran 404 direct, sans appel API
-    if (!Number.isInteger(id) || id <= 0) {
-      this.invalidId = true
-      return
+    await this.loadMatch()
+  },
+  watch: {
+    // vue-router réutilise l'instance quand seul :id change (/match/123 → /match/456) :
+    // sans ce watcher, la page garderait les données de l'ancien match
+    '$route.params.id'() {
+      if (this.$route.name !== 'MatchDetails') return
+      this.loadMatch()
     }
+  },
+  methods: {
+    async loadMatch() {
+      this.invalidId = false
+      const id = Number(this.$route.params.id)
+      // Id non numérique (/match/abc) : écran 404 direct, sans appel API
+      if (!Number.isInteger(id) || id <= 0) {
+        this.invalidId = true
+        return
+      }
 
-    this.loading = true
-    const accountId = Number(this.$route.query.accountId)
-    await Promise.all([
-      this.matchDetailStore.fetchMatchDetail(id),
-      this.assetStore.loadCatalogs(),
-      // L'historique du joueur alimente le radar "vs moyennes" ;
-      // déjà en cache 30 min quand on arrive depuis l'accueil
-      Number.isInteger(accountId) && accountId > 0
-        ? this.playerHistoryStore.fetchListPlayerHistoryData(accountId).catch(() => {})
-        : Promise.resolve()
-    ])
-    this.loading = false
+      this.loading = true
+
+      // Catalogues CDN (plusieurs Mo) et historique du joueur (radar "vs moyennes",
+      // déjà en cache 30 min quand on arrive depuis l'accueil) : non bloquants,
+      // les sections concernées sont derrière v-if et se remplissent réactivement
+      this.assetStore.loadCatalogs().catch(() => {})
+      const accountId = Number(this.$route.query.accountId)
+      if (Number.isInteger(accountId) && accountId > 0) {
+        this.playerHistoryStore.fetchListPlayerHistoryData(accountId).catch(() => {})
+      }
+
+      await this.matchDetailStore.fetchMatchDetail(id)
+      this.loading = false
+    },
+    spellCooldownLabel(spellId) {
+      const cooldown = this.assetStore.getSummonerSpellInfo(spellId)?.cooldown
+      return cooldown != null ? `CD : ${cooldown} sec` : null
+    }
   },
   computed: {
     match() {
@@ -393,45 +409,59 @@ export default {
         {
           label: 'Kills',
           value: this.match.kill,
-          avg: avgOf(history.map((h) => h.kill))
+          avg: avgOf(history.map((h) => h.kill)),
+          explanation: 'Champions ennemis éliminés pendant le match.'
         },
         {
           label: 'Assists',
           value: this.match.assist,
-          avg: avgOf(history.map((h) => h.assist))
+          avg: avgOf(history.map((h) => h.assist)),
+          explanation: 'Kills auxquels tu as participé sans porter le coup final.'
         },
         {
           // Plus haut = mieux : 1/(morts+1) évite la division par zéro
           label: 'Survie',
           value: 1 / (this.match.deaths + 1),
-          avg: avgOf(history.map((h) => (h.deaths != null ? 1 / (h.deaths + 1) : null)))
+          avg: avgOf(history.map((h) => (h.deaths != null ? 1 / (h.deaths + 1) : null))),
+          explanation:
+            'Score basé sur tes morts, inversé pour que plus haut = mieux : 0 mort donne le score parfait (1.0), et chaque mort le fait baisser (4 morts = 0.2).'
         },
         {
           label: 'CS/min',
           value: perMin(this.match.creepScore, this.match.gameDuration),
-          avg: avgOf(history.map((h) => perMin(h.creepScore, h.gameDuration)))
+          avg: avgOf(history.map((h) => perMin(h.creepScore, h.gameDuration))),
+          explanation: 'Sbires et monstres de la jungle tués par minute.'
         },
         {
           label: 'Vision/min',
           value: perMin(this.match.visionScore, this.match.gameDuration),
-          avg: avgOf(history.map((h) => perMin(h.visionScore, h.gameDuration)))
+          avg: avgOf(history.map((h) => perMin(h.visionScore, h.gameDuration))),
+          explanation: 'Score de vision par minute : balises posées, détruites et vision utile.'
         },
         // Challenges Riot, exposés dans la collection depuis l'enrichissement
         // de l'API : absents des vieux matchs, l'axe disparaît alors du radar
         {
           label: 'Dégâts/min',
           value: this.match.damagePerMinute,
-          avg: avgOf(history.map((h) => h.damagePerMinute))
+          avg: avgOf(history.map((h) => h.damagePerMinute)),
+          explanation: 'Dégâts infligés aux champions ennemis par minute.'
         },
         {
           label: 'Or/min',
           value: this.match.goldPerMinute,
-          avg: avgOf(history.map((h) => h.goldPerMinute))
+          avg: avgOf(history.map((h) => h.goldPerMinute)),
+          explanation: "Or gagné par minute (sbires, kills, objectifs, revenu passif)."
         }
       ]
 
       // Un axe sans valeur ou sans moyenne fausserait le polygone : on l'écarte
       return candidates.filter((a) => a.value != null && a.avg != null)
+    },
+    // La moyenne porte sur l'historique hors match affiché : le libellé
+    // reflète le nombre réel de matchs plutôt qu'un "5 derniers" figé
+    radarAvgLabel() {
+      const n = this.playerHistory.length
+      return n > 1 ? `Moyenne des ${n} derniers matchs` : 'Match précédent'
     },
     statTiles() {
       const tiles = []
@@ -467,20 +497,6 @@ export default {
 </script>
 
 <style scoped>
-/* Couleurs KDA (mêmes valeurs que PlayerDetails.vue) */
-.text-lol-perfect {
-  color: #fcc419;
-}
-.text-lol-excellent {
-  color: #81c784;
-}
-.text-lol-good {
-  color: #ffee58;
-}
-.text-lol-poor {
-  color: #ef5350;
-}
-
 .win-glow {
   text-shadow: 0 0 18px rgba(200, 170, 110, 0.45);
 }
@@ -515,14 +531,4 @@ export default {
   }
 }
 
-/* Slot d'item vide : motif diagonal subtil */
-.empty-slot {
-  background-image: repeating-linear-gradient(
-    45deg,
-    transparent,
-    transparent 4px,
-    rgba(200, 170, 110, 0.06) 4px,
-    rgba(200, 170, 110, 0.06) 8px
-  );
-}
 </style>

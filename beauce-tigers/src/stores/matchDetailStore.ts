@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { MatchDetail } from '../../types/matchDetail'
 import { playerDataAPI } from '@/api/apiPlayer'
+import { isCacheFresh } from '@/utils/cache'
 
 export const useMatchDetailStore = defineStore('matchDetail', () => {
   const matchDetail = ref<MatchDetail | null>(null)
@@ -61,12 +62,9 @@ export const useMatchDetailStore = defineStore('matchDetail', () => {
     notFound.value = false
     error.value = false
 
-    const now = Date.now()
     const cached = detailsById.value[id]
-    const fetchedAt = detailFetchedAtById.value[id]
-    const THIRTY_MIN = 30 * 60 * 1000
 
-    if (cached && fetchedAt && now - fetchedAt < THIRTY_MIN) {
+    if (cached && isCacheFresh(detailFetchedAtById.value[id])) {
       matchDetail.value = cached
       return
     }
@@ -76,7 +74,7 @@ export const useMatchDetailStore = defineStore('matchDetail', () => {
       const detail = mapToMatchDetail(data)
 
       detailsById.value[id] = detail
-      detailFetchedAtById.value[id] = now
+      detailFetchedAtById.value[id] = Date.now()
       matchDetail.value = detail
     } catch (e: any) {
       matchDetail.value = null

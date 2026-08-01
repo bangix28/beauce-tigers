@@ -4,9 +4,10 @@ import Accueil from '@/views/Accueil.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   // Le carrousel d'historique peut être scrollé en bas de page :
-  // on remonte toujours en haut en arrivant sur le détail d'un match
-  scrollBehavior() {
-    return { top: 0 }
+  // on remonte en haut en arrivant sur le détail d'un match, mais
+  // back/forward navigateur restaure la position sauvegardée
+  scrollBehavior(to, from, savedPosition) {
+    return savedPosition ?? { top: 0 }
   },
   routes: [
     {

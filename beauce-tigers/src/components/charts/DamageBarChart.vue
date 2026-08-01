@@ -23,13 +23,19 @@ export default {
   },
   computed: {
     chartData() {
+      // Une stat absente (null) est écartée plutôt qu'affichée comme un vrai 0
+      const entries = [
+        { label: 'Dégâts infligés', value: this.damageDealt, color: LOL_BLUE },
+        { label: 'Dégâts subis', value: this.damageTaken, color: LOL_RED }
+      ].filter((e) => e.value != null)
+
       return {
-        labels: ['Dégâts infligés', 'Dégâts subis'],
+        labels: entries.map((e) => e.label),
         datasets: [
           {
-            data: [this.damageDealt ?? 0, this.damageTaken ?? 0],
-            backgroundColor: [LOL_BLUE + 'cc', LOL_RED + 'cc'],
-            borderColor: [LOL_BLUE, LOL_RED],
+            data: entries.map((e) => e.value),
+            backgroundColor: entries.map((e) => e.color + 'cc'),
+            borderColor: entries.map((e) => e.color),
             borderWidth: 1,
             borderRadius: 3,
             barThickness: 28
