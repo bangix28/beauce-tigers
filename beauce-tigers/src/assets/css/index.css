@@ -101,6 +101,19 @@ h1, h2, h3, h4, h5, h6 {
     animation: fadeIn 0.3s ease-out forwards;
 }
 
+/* Variante pour les listes en cascade : `both` applique l'état initial pendant
+   l'animation-delay, sinon la ligne s'affiche pleine puis clignote au démarrage */
+.animate-fade-in-stagger {
+    animation: fadeIn 0.35s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .animate-fade-in,
+    .animate-fade-in-stagger {
+        animation: none;
+    }
+}
+
 /* Effets de survol pour les cartes */
 .card {
     @apply bg-lol-darker rounded-lg border border-gray-800 p-4 transition-all duration-300;
