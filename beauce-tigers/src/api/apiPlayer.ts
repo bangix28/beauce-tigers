@@ -51,6 +51,40 @@ export const playerDataAPI = {
     const response = await apiClient.get(formattedUrl);
 
     return response.data;
+  },
+
+  getRankedRace: async (queue?: string, period?: string) => {
+    const urlToFetch = import.meta.env.VITE_RIOT_RANKED_RACE_URL;
+    if (!urlToFetch) {
+      throw new Error('VITE_RIOT_RANKED_RACE_URL manquante dans le .env (voir .env.template)');
+    }
+    const response = await apiClient.get(urlToFetch, {
+      // Sans param : les défauts amont s'appliquent (solo / week)
+      params: { queue, period }
+    });
+
+    return response.data;
+  },
+
+  getRankedRaceEvents: async () => {
+    const urlToFetch = import.meta.env.VITE_RIOT_RANKED_RACE_EVENTS_URL;
+    if (!urlToFetch) {
+      throw new Error('VITE_RIOT_RANKED_RACE_EVENTS_URL manquante dans le .env (voir .env.template)');
+    }
+    const response = await apiClient.get(urlToFetch);
+
+    return response.data;
+  },
+
+  getRankedRaceEvent: async (id: number) => {
+    const urlTemplate = import.meta.env.VITE_RIOT_RANKED_RACE_EVENT_URL;
+    if (!urlTemplate) {
+      throw new Error('VITE_RIOT_RANKED_RACE_EVENT_URL manquante dans le .env (voir .env.template)');
+    }
+    const formattedUrl = urlTemplate.replace(':id', String(id));
+    const response = await apiClient.get(formattedUrl);
+
+    return response.data;
   }
 
 };

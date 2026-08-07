@@ -29,6 +29,13 @@ const router = createRouter({
       component: () => import('@/views/AccountDetails.vue'),
       props: true
     },
+    {
+      path: '/courses',
+      name: 'RankedRace',
+      // Lazy aussi : la piste de course et ses tables n'ont rien à faire dans
+      // le bundle de l'accueil
+      component: () => import('@/views/RankedRace.vue')
+    },
   ]
 })
 
