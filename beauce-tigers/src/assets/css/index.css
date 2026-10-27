@@ -1,5 +1,7 @@
 /* styles.css */
 @import "tailwindcss";
+@import "./lan-theme.css";
+@import "./motion.css";
 
 @theme {
     --color-lol-gold: #C8AA6E;
@@ -67,8 +69,27 @@ h1, h2, h3, h4, h5, h6 {
     @apply bg-lol-blue text-white hover:bg-blue-600 hover:shadow-blue-500/20;
 }
 
+.btn-discord {
+    @apply bg-[#5865F2] text-white hover:bg-[#4752c4] hover:shadow-indigo-500/20;
+}
+
+.btn:disabled {
+    @apply opacity-50 cursor-not-allowed hover:scale-100 hover:shadow-none;
+}
+
+/* Anneau de focus clavier : l'outline n'est plus supprimé, seulement réservé au clavier */
+.btn:focus-visible {
+    outline: 2px solid var(--lan-tiger, #F08A24);
+    outline-offset: 3px;
+}
+
 .input {
-    @apply px-4 py-2 bg-lol-darker border border-gray-700 rounded-lg focus:outline-none focus:border-lol-gold text-gray-100 transition-all duration-200;
+    @apply px-4 py-2 bg-lol-darker border border-gray-700 rounded-lg focus:border-lol-gold text-gray-100 transition-all duration-200;
+}
+
+.input:focus-visible {
+    outline: 2px solid var(--lan-tiger, #F08A24);
+    outline-offset: 2px;
 }
 
 /* Styles pour le tableau */
@@ -203,5 +224,21 @@ h1, h2, h3, h4, h5, h6 {
     .btn:active,
     .card:active {
         @apply scale-95;
+    }
+}
+
+/* Mouvement réduit : plus de zoom ni de soulèvement au survol ou à la pression.
+   Tailwind 4 passe par la propriété `scale`, d'où les deux remises à zéro. */
+@media (prefers-reduced-motion: reduce) {
+    .btn,
+    .btn:hover,
+    .btn:active,
+    .card,
+    .card:hover,
+    .card:active,
+    .leaderboard-row,
+    .leaderboard-row:hover {
+        scale: none;
+        transform: none;
     }
 }

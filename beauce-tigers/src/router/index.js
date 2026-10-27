@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Accueil from '@/views/Accueil.vue'
+import { usePlayerAuthStore } from '@/stores/playerAuthStore'
+import { startDiscordLogin } from '@/utils/discordAuth'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -36,7 +38,46 @@ const router = createRouter({
       // le bundle de l'accueil
       component: () => import('@/views/RankedRace.vue')
     },
+    {
+      // Doit correspondre au caractère près à VITE_DISCORD_REDIRECT_URI
+      path: '/auth/discord/callback',
+      name: 'DiscordCallback',
+      component: () => import('@/views/DiscordCallback.vue')
+    },
+    {
+      path: '/profil',
+      name: 'PlayerProfile',
+      component: () => import('@/views/PlayerProfile.vue'),
+      meta: { requiresPlayer: true }
+    },
+    {
+      // Pas de :lanId : la LAN du joueur vient de GET /me/lan-events/current
+      path: '/lan',
+      name: 'LanChallenges',
+      component: () => import('@/views/LanChallenges.vue'),
+      meta: { requiresPlayer: true }
+    },
+    {
+      // URL affichée par l'agent de LAN (verificationUrl côté api-bot)
+      path: '/agent',
+      name: 'AgentConnect',
+      component: () => import('@/views/AgentConnect.vue'),
+      meta: { requiresPlayer: true }
+    },
   ]
+})
+
+// Pages du joueur : sans jeton, on passe par Discord puis on revient sur la page
+// demandée. Un jeton expiré est rattrapé au premier 401 par le client joueur.
+router.beforeEach((to) => {
+  if (!to.meta.requiresPlayer || usePlayerAuthStore().isLoggedIn) return true
+
+  try {
+    startDiscordLogin({ returnTo: to.fullPath })
+  } catch (e) {
+    console.error(e)
+  }
+  return false
 })
 
 export default router
