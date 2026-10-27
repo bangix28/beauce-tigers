@@ -7,10 +7,20 @@
         <p class="callback__message" data-test="callback-error">{{ errorMessage }}</p>
         <p class="lan-muted text-sm">Rien de grave : tu peux relancer la connexion en un clic.</p>
         <div class="flex flex-wrap justify-center gap-3 mt-2">
-          <button type="button" class="lan-btn lan-btn--primary" @click="retry">
+          <button
+            type="button"
+            class="lan-btn lan-btn--primary"
+            data-test="callback-retry"
+            @click="retry"
+          >
             <LogIn class="w-4 h-4" aria-hidden="true" /> Réessayer avec Discord
           </button>
-          <button type="button" class="lan-btn lan-btn--ghost" @click="$router.replace('/')">
+          <button
+            type="button"
+            class="lan-btn lan-btn--ghost"
+            data-test="callback-home"
+            @click="$router.replace('/')"
+          >
             Retour à l'accueil
           </button>
         </div>

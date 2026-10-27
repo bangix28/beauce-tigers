@@ -1,7 +1,13 @@
+import { navigateTo } from '@/utils/browserNavigation'
+
 // Aller-retour OAuth2 avec Discord (scope identify). Le code reçu au retour est
 // échangé contre un JWT par l'api-bot, via le BFF : voir playerAuthStore.
+// Seuls le Client ID (public) et l'URL de retour vivent côté front, par
+// environnement (.env.development / .env.production) ; le secret reste sur l'API.
 
 const AUTHORIZE_URL = 'https://discord.com/oauth2/authorize'
+/** Chemin de la page de retour : déclaré chez Discord et dans l'api-bot au caractère près */
+export const CALLBACK_PATH = '/auth/discord/callback'
 const PENDING_LOGIN_KEY = 'discordPendingLogin'
 const SILENT_ATTEMPT_KEY = 'discordSilentAttemptAt'
 /**
@@ -32,12 +38,53 @@ export const randomState = (): string => {
   return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('')
 }
 
-export const buildAuthorizeUrl = (state: string, silent = false): string => {
+export interface DiscordConfig {
+  clientId: string
+  redirectUri: string
+}
+
+type DiscordEnv = Partial<Record<'VITE_DISCORD_CLIENT_ID' | 'VITE_DISCORD_REDIRECT_URI', string>>
+
+const LOCAL_HOSTS = ['localhost', '127.0.0.1']
+
+/**
+ * Configuration Discord de l'environnement, vérifiée. Une URL de retour qui
+ * diffère d'un caractère de celle déclarée chez Discord et dans l'api-bot finit
+ * en 401 discord_login_failed, illisible : on préfère échouer ici, en clair.
+ */
+export const readDiscordConfig = (env: DiscordEnv = import.meta.env): DiscordConfig => {
+  const clientId = env.VITE_DISCORD_CLIENT_ID ?? ''
+  const redirectUri = env.VITE_DISCORD_REDIRECT_URI ?? ''
+
+  if (!/^\d+$/.test(clientId)) {
+    throw new Error('VITE_DISCORD_CLIENT_ID absent ou invalide (un identifiant Discord, que des chiffres)')
+  }
+
+  let url: URL
+  try {
+    url = new URL(redirectUri)
+  } catch {
+    throw new Error(`VITE_DISCORD_REDIRECT_URI absente ou invalide : « ${redirectUri} »`)
+  }
+
+  const expected = `${url.origin}${CALLBACK_PATH}`
+  const secure = url.protocol === 'https:' || (url.protocol === 'http:' && LOCAL_HOSTS.includes(url.hostname))
+  if (redirectUri !== expected || !secure) {
+    throw new Error(
+      `VITE_DISCORD_REDIRECT_URI doit valoir exactement « ${expected} » (https hors local, ` +
+        `sans / final ni paramètre) ; reçu « ${redirectUri} »`
+    )
+  }
+
+  return { clientId, redirectUri }
+}
+
+export const buildAuthorizeUrl = (state: string, silent = false, config = readDiscordConfig()): string => {
   const params = new URLSearchParams({
-    client_id: import.meta.env.VITE_DISCORD_CLIENT_ID,
+    client_id: config.clientId,
     response_type: 'code',
     scope: 'identify',
-    redirect_uri: import.meta.env.VITE_DISCORD_REDIRECT_URI,
+    redirect_uri: config.redirectUri,
     state
   })
   if (silent) params.set('prompt', 'none')
@@ -46,15 +93,12 @@ export const buildAuthorizeUrl = (state: string, silent = false): string => {
 }
 
 export const startDiscordLogin = ({ returnTo = '/', silent = false } = {}): void => {
-  if (!import.meta.env.VITE_DISCORD_CLIENT_ID || !import.meta.env.VITE_DISCORD_REDIRECT_URI) {
-    throw new Error(
-      'VITE_DISCORD_CLIENT_ID ou VITE_DISCORD_REDIRECT_URI manquante dans le .env (voir .env.template)'
-    )
-  }
+  // Avant de stocker quoi que ce soit : une configuration fausse lève ici
+  const config = readDiscordConfig()
 
   const pending: PendingLogin = { state: randomState(), returnTo: safeReturnTo(returnTo), silent }
   sessionStorage.setItem(PENDING_LOGIN_KEY, JSON.stringify(pending))
-  window.location.assign(buildAuthorizeUrl(pending.state, silent))
+  navigateTo(buildAuthorizeUrl(pending.state, silent, config))
 }
 
 /**
