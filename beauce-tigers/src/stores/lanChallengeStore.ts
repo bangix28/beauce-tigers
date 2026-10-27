@@ -10,6 +10,7 @@ import type {
 } from '../../types/lanChallenge'
 import { lanChallengeAPI } from '@/api/apiLanChallenge'
 import { ApiError } from '@/api/playerHttp'
+import { FEED_RECAP_LIMIT } from '@/utils/roundRecap'
 
 /** Erreurs qui rendent la page inutilisable : on remplace le parcours par le message */
 const BLOCKING_CODES = ['not_a_participant', 'lan_not_found', 'several_accounts_in_lan']
@@ -69,7 +70,8 @@ export const useLanChallengeStore = defineStore('lanChallenge', () => {
     const id = lanId.value
     const [standingsResult, feedResult] = await Promise.allSettled([
       lanChallengeAPI.getStandings(id),
-      lanChallengeAPI.getFeed(id)
+      // Le maximum de l'API : le fil alimente aussi le récap de la soirée
+      lanChallengeAPI.getFeed(id, FEED_RECAP_LIMIT)
     ])
     if (standingsResult.status === 'fulfilled') standings.value = standingsResult.value
     if (feedResult.status === 'fulfilled') feed.value = feedResult.value.entries

@@ -9,6 +9,7 @@ import {
   catalogue,
   curse,
   currentLan,
+  feedEntry,
   myRun,
   pickpocket,
   result,
@@ -93,6 +94,33 @@ describe('LanChallenges', () => {
 
       expect(api.getMyRun).toHaveBeenCalledWith(3)
       expect(api.getStandings).toHaveBeenCalledWith(3)
+    })
+  })
+
+  describe('récap de la soirée', () => {
+    it('charge le fil au maximum de l\'API (50) pour alimenter le récap', async () => {
+      await mountPage()
+
+      expect(api.getFeed).toHaveBeenCalledWith(3, 50)
+    })
+
+    it('affiche les manches des autres joueurs, sans gonfler la colonne des exploits', async () => {
+      const rounds = Array.from({ length: 25 }, (_, index) =>
+        feedEntry({
+          riotId: index % 2 ? 'Ami#EUW' : 'Moi#EUW',
+          gameId: `EUW1_${Math.floor(index / 2)}`,
+          occurredAt: new Date(Date.UTC(2026, 10, 7, 20, 59 - index)).toISOString()
+        })
+      )
+      api.getFeed.mockResolvedValue({ entries: rounds })
+
+      const page = await mountPage()
+
+      const recap = page.find('[data-test="recap-section"]')
+      expect(recap.findAll('[data-test="recap-game"]')).toHaveLength(13)
+      expect(recap.text()).toContain('Ami#EUW')
+      // La colonne « Exploits » garde ses 20 dernières entrées
+      expect(page.findAll('.feed__item')).toHaveLength(20)
     })
   })
 
