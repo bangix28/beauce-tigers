@@ -16,5 +16,16 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
+  },
+  // L'URL de retour Discord est déclarée sur ce port au caractère près :
+  // mieux vaut échouer au démarrage que servir le front sur un autre port
+  server: {
+    port: 3000,
+    strictPort: true
+  },
+  test: {
+    environment: 'jsdom',
+    include: ['src/**/*.spec.ts'],
+    restoreMocks: true
   }
 })
