@@ -38,6 +38,12 @@ export const usePlayerAuthStore = defineStore('playerAuth', () => {
   const runCallback = async (query: DiscordCallbackQuery): Promise<DiscordCallbackOutcome> => {
     const pending = consumePendingLogin(query.state)
     if (!pending) {
+      // Page de retour rouverte après une connexion réussie (rechargement,
+      // retour arrière) : son state est déjà consommé, le code aussi. Le
+      // joueur est connecté, rien à échanger : on le ramène sans erreur.
+      if (token.value) {
+        return { kind: 'success', returnTo: '/' }
+      }
       return {
         kind: 'error',
         message: 'Le retour de Discord n\'a pas pu être vérifié. Relance la connexion depuis le site.'

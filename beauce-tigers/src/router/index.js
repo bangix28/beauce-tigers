@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Accueil from '@/views/Accueil.vue'
 import { usePlayerAuthStore } from '@/stores/playerAuthStore'
-import { startDiscordLogin } from '@/utils/discordAuth'
+import { CALLBACK_PATH, startDiscordLogin } from '@/utils/discordAuth'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -39,8 +39,8 @@ const router = createRouter({
       component: () => import('@/views/RankedRace.vue')
     },
     {
-      // Doit correspondre au caractère près à VITE_DISCORD_REDIRECT_URI
-      path: '/auth/discord/callback',
+      // Même constante que la vérification de VITE_DISCORD_REDIRECT_URI
+      path: CALLBACK_PATH,
       name: 'DiscordCallback',
       component: () => import('@/views/DiscordCallback.vue')
     },
