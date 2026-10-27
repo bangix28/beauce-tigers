@@ -10,6 +10,9 @@ interface ImportMetaEnv {
   readonly VITE_RIOT_RANKED_RACE_URL: string;
   readonly VITE_RIOT_RANKED_RACE_EVENTS_URL: string;
   readonly VITE_RIOT_RANKED_RACE_EVENT_URL: string;
+  readonly VITE_PLAYER_API_URL: string;
+  readonly VITE_DISCORD_CLIENT_ID: string;
+  readonly VITE_DISCORD_REDIRECT_URI: string;
 }
 
 interface ImportMeta {

@@ -4,6 +4,7 @@ const app = express();
 const cors = require('cors');
 const PORT = process.env.PORT || 3001;
 const RouteurApi = require("./routeur");
+const playerRouter = require('./playerProxy');
 const fs = require('fs');
 const https = require('https');
 const path = require('path');
@@ -213,6 +214,9 @@ apiRouter.get('/ranked-race-events/:id', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 })
+
+// Joueurs connectés par Discord : relais du jeton du joueur, sans le compte API
+apiRouter.use(playerRouter);
 
 // ?? et pas || : API_PREFIX= (chaîne vide) est un choix valide qui signifie
 // "pas de préfixe" (prod derrière reverse proxy), alors qu'une variable
