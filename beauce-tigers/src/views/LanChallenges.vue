@@ -220,6 +220,16 @@
               <h2 class="lan-title">Mes manches</h2>
               <RunHistory :results="run.results" />
             </section>
+
+            <section class="lan-panel" data-test="recap-section">
+              <h2 class="lan-title mb-1">Récap de la soirée</h2>
+              <p class="lan-muted text-sm mb-4">Qui a joué quoi, et comment ça s'est fini.</p>
+              <LanRoundRecap
+                :feed="feed"
+                :standings="standings?.entries ?? []"
+                :my-riot-id="myRun.riotId"
+              />
+            </section>
           </div>
 
           <aside class="space-y-6 min-w-0">
@@ -229,7 +239,7 @@
             </section>
             <section class="lan-panel">
               <h2 class="lan-title">Exploits de la soirée</h2>
-              <LanFeedList :entries="feed" :my-riot-id="myRun.riotId" />
+              <LanFeedList :entries="latestFeed" :my-riot-id="myRun.riotId" />
             </section>
           </aside>
         </div>
@@ -252,6 +262,7 @@ import {
 } from 'lucide-vue-next'
 import LanCard from '@/components/lan/LanCard.vue'
 import LanFeedList from '@/components/lan/LanFeedList.vue'
+import LanRoundRecap from '@/components/lan/LanRoundRecap.vue'
 import LanStandingsTable from '@/components/lan/LanStandingsTable.vue'
 import OfferPicker from '@/components/lan/OfferPicker.vue'
 import RerollPips from '@/components/lan/RerollPips.vue'
@@ -273,6 +284,8 @@ const REFRESH_INTERVAL_MS = 15 * 1000
 /** Plafond de setTimeout (~24,8 jours) : au-delà, le délai déborde et part tout de suite */
 const MAX_TIMEOUT_MS = 2 ** 31 - 1
 const SABOTAGE_TOAST_MS = 4000
+/** Exploits visibles dans la colonne : le reste du fil sert au récap */
+const EXPLOITS_SHOWN = 20
 const VICTIM_TOAST_MS = 6000
 
 /** Titre humain + ce que le joueur peut faire ; le message de l'API reste affiché tel quel */
@@ -313,6 +326,7 @@ export default {
     Hourglass,
     LanCard,
     LanFeedList,
+    LanRoundRecap,
     LanStandingsTable,
     LiveIndicator,
     OfferPicker,
@@ -381,6 +395,10 @@ export default {
     },
     feed() {
       return this.lanChallengeStore.feed
+    },
+    /** Le fil est chargé large pour le récap ; les exploits n'en montrent que le haut */
+    latestFeed() {
+      return this.feed.slice(0, EXPLOITS_SHOWN)
     },
     pageError() {
       return this.lanChallengeStore.pageError

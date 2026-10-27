@@ -33,10 +33,10 @@
           <h3 class="lan-card__label">{{ card.label }}</h3>
           <p v-if="!compact" class="lan-card__description">{{ card.description }}</p>
 
-          <p v-if="card.needsTarget && !compact" class="lan-card__hint">
+          <p v-if="card.needsTarget && showHints" class="lan-card__hint">
             <Target class="lan-card__hint-icon" aria-hidden="true" /> Vise un joueur · effet immédiat
           </p>
-          <p v-else-if="card.secret && !compact" class="lan-card__hint">
+          <p v-else-if="card.secret && showHints" class="lan-card__hint">
             <EyeOff class="lan-card__hint-icon" aria-hidden="true" /> Carte secrète
           </p>
 
@@ -141,12 +141,17 @@ export default {
     /** Carte jouée sur un match en cours : sceau imprimé dessus */
     locked: { type: Boolean, default: false },
     /** Carte écartée d'un choix en cours */
-    dimmed: { type: Boolean, default: false }
+    dimmed: { type: Boolean, default: false },
+    /** Mentions de règle (« Vise un joueur », « Carte secrète ») : utiles au choix, pas après coup */
+    hints: { type: Boolean, default: true }
   },
   data() {
     return { hasBack: this.faceDown }
   },
   computed: {
+    showHints() {
+      return this.hints && !this.compact
+    },
     icon() {
       return CARD_ICONS[this.card.code] ?? Sparkles
     },

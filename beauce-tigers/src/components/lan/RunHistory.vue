@@ -87,8 +87,9 @@ export default {
   grid-template-rows: 1fr;
 }
 
+/* overflow coupé seulement pendant l'animation (motion.css) : ouvert, les
+   infobulles des cartes ne doivent pas être tronquées */
 .run-history__older-inner {
-  overflow: hidden;
   min-height: 0;
 }
 

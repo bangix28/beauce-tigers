@@ -1,17 +1,32 @@
 <template>
-  <li class="history-row" :data-verdict="result.verdict">
-    <span class="history-row__round">Manche {{ round }}</span>
+  <li
+    class="history-row"
+    :class="{ 'history-row--wide-label': labelWide }"
+    :data-verdict="result.verdict"
+  >
+    <span
+      class="history-row__round"
+      :class="{ 'history-row__round--wide': labelWide, 'history-row__round--me': labelStrong }"
+      :title="label ?? undefined"
+    >
+      {{ label ?? `Manche ${round}` }}
+    </span>
 
     <span class="history-row__card" :class="`history-row__card--${result.card.rarity}`">
       <span class="history-row__dot" aria-hidden="true"></span>
-      <span class="history-row__label">{{ result.card.label }}</span>
+      <!-- Survol, focus clavier ou toucher : la vraie carte sort à côté de la ligne -->
+      <CardPeek :card="result.card">
+        <span class="history-row__label">{{ result.card.label }}</span>
+      </CardPeek>
     </span>
 
-    <span v-if="result.curseApplied" class="history-row__tag history-row__tag--curse" title="Tu étais maudit">
-      <Biohazard class="history-row__tag-icon" aria-hidden="true" /> maudit
+    <span v-if="result.curseApplied" class="history-row__tag history-row__tag--curse" :title="curseTitle">
+      <Biohazard class="history-row__tag-icon" aria-hidden="true" />
+      <span class="history-row__tag-text">maudit</span>
     </span>
     <span v-if="result.roundBonus" class="history-row__tag history-row__tag--bonus" title="Bonus de manche">
-      <Users class="history-row__tag-icon" aria-hidden="true" /> bonus
+      <Users class="history-row__tag-icon" aria-hidden="true" />
+      <span class="history-row__tag-text">bonus</span>
     </span>
 
     <span class="history-row__verdict" :class="`history-row__verdict--${verdictKey}`">
@@ -24,6 +39,7 @@
 
 <script>
 import { Biohazard, CircleCheck, CircleHelp, CircleX, Users } from 'lucide-vue-next'
+import CardPeek from '@/components/lan/CardPeek.vue'
 
 const VERDICTS = {
   success: { icon: CircleCheck, label: 'réussi' },
@@ -31,13 +47,20 @@ const VERDICTS = {
   unknown: { icon: CircleHelp, label: 'inconnu' }
 }
 
-// Une manche de l'historique : numéro, carte, marqueurs, verdict
+// Une manche : repère (numéro, ou joueur / heure dans le récap), carte, marqueurs, verdict
 export default {
   name: 'RunHistoryRow',
-  components: { Biohazard, Users },
+  components: { Biohazard, CardPeek, Users },
   props: {
     result: { type: Object, required: true },
-    round: { type: Number, required: true }
+    round: { type: Number, default: null },
+    /** Remplace « Manche N » : nom du joueur ou heure, dans le récap de la soirée */
+    label: { type: String, default: null },
+    /** Repère long (Riot ID) : colonne plus large, tronquée */
+    labelWide: { type: Boolean, default: false },
+    /** Repère mis en valeur (le joueur connecté) */
+    labelStrong: { type: Boolean, default: false },
+    curseTitle: { type: String, default: 'Tu étais maudit' }
   },
   computed: {
     verdictKey() {
@@ -69,6 +92,46 @@ export default {
   font-variant-numeric: tabular-nums;
 }
 
+.history-row__round--wide {
+  width: 8.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--lan-ink-soft);
+}
+
+.history-row__round--me {
+  font-weight: bold;
+  color: var(--lan-tiger);
+}
+
+/* Petits écrans : le joueur passe sur sa propre ligne, les badges gardent leur
+   seule icône (le mot reste lu par les lecteurs d'écran) — sinon le nom de la
+   carte se réduisait à une lettre et la page défilait de côté */
+@media (max-width: 479px) {
+  .history-row--wide-label {
+    flex-wrap: wrap;
+    row-gap: 0.15rem;
+  }
+
+  .history-row--wide-label .history-row__round--wide {
+    width: 100%;
+  }
+
+  .history-row__tag {
+    padding: 0.2rem;
+  }
+
+  .history-row__tag-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
+
 .history-row__card {
   flex: 1;
   min-width: 0;
@@ -84,6 +147,12 @@ export default {
   white-space: nowrap;
 }
 
+/* Survol de la carte : sa pastille de matière grossit, la carte sort à côté */
+.history-row__card:hover .history-row__dot,
+.history-row__card:focus-within .history-row__dot {
+  transform: scale(1.4);
+}
+
 /* Pastille de matière de la carte */
 .history-row__dot {
   width: 0.6rem;
@@ -91,6 +160,7 @@ export default {
   flex-shrink: 0;
   border-radius: 9999px;
   background: var(--lan-silver);
+  transition: transform var(--motion-base, 220ms) var(--ease-spring, ease-out);
 }
 
 .history-row__card--gold .history-row__dot {
