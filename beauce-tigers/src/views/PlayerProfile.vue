@@ -91,7 +91,8 @@
           <div class="flex-1 min-w-0">
             <h2 class="lan-title mb-1">Connecter mon agent</h2>
             <p class="lan-muted">
-              Le petit programme de LAN qui verrouille ta carte au lancement de chaque partie.
+              Le petit programme de LAN qui lit tes parties et verrouille les cartes. Un seul
+              par partie suffit : si un joueur de ta partie a le sien, tu peux t'en passer.
             </p>
           </div>
           <router-link to="/agent" class="lan-btn lan-btn--ghost">Connecter</router-link>

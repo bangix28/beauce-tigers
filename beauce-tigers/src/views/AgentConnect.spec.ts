@@ -34,6 +34,7 @@ describe('AgentConnect', () => {
 
     expect(approve).toHaveBeenCalledWith('K7QF-92PZ')
     expect(wrapper.find('[data-test="agent-success"]').text()).toContain('Ton agent est prêt')
+    expect(wrapper.find('[data-test="agent-timing"]').text()).toContain('avant chaque partie')
   })
 
   it('code expiré : message du contrat', async () => {

@@ -86,6 +86,7 @@ describe('LanChallenges', () => {
 
       expect(page.find('[data-test="lan-upcoming"]').text()).toContain("LAN d'automne")
       expect(page.find('[data-test="lan-upcoming"]').text()).toContain('07/11/2026')
+      expect(page.find('[data-test="lan-upcoming"] [data-test="lan-queues"]').text()).toContain('ARAM du chaos')
       expect(api.getMyRun).not.toHaveBeenCalled()
     })
 
@@ -154,7 +155,9 @@ describe('LanChallenges', () => {
       const page = await mountPage()
 
       expect(page.find('[data-test="screen-card_chosen"]').text()).toContain('Lance ta partie')
-      expect(page.find('[data-test="screen-card_chosen"]').text()).toContain('Ton agent tourne ?')
+      expect(page.find('[data-test="screen-card_chosen"]').text()).toContain(
+        'Le tien ou celui d\'un autre joueur suffit'
+      )
     })
 
     it('carte verrouillée : en partie', async () => {
