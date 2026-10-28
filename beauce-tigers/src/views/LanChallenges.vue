@@ -70,6 +70,7 @@
           Les défis ouvrent le {{ formatDate(lan.startsAt, "dd/MM/yyyy 'à' HH:mm") }} — la page
           s'ouvrira d'elle-même à ce moment-là.
         </p>
+        <LanQueues v-if="lan.queues?.length" :queues="lan.queues" class="max-w-md" />
         <router-link to="/agent" class="lan-btn lan-btn--ghost">
           <PlugZap class="w-4 h-4" aria-hidden="true" /> Préparer mon agent
         </router-link>
@@ -111,6 +112,7 @@
           <!-- Pleine largeur : coincée à côté du score, la consigne se lisait mot à mot sur mobile -->
           <StatusLine :text="nextStepText" class="mt-4" />
           <RunStepper v-if="run && !lanFinished" :step="step" class="mt-5" />
+          <LanQueues v-if="!lanFinished && lan.queues?.length" :queues="lan.queues" class="mt-5" />
         </header>
 
         <p v-if="lanFinished" class="lan-finished" role="status" data-test="lan-finished">
@@ -188,7 +190,9 @@
                     <div class="agent-reminder">
                       <PlugZap class="agent-reminder__icon" aria-hidden="true" />
                       <p>
-                        Ton agent tourne ? Sans lui, ta carte ne se verrouillera pas.
+                        Un agent tourne dans ta partie ? Le tien ou celui d'un autre joueur
+                        suffit, lancé avant le chargement. Sans agent, ta carte ne se
+                        verrouillera pas.
                         <router-link to="/agent" class="agent-reminder__link">
                           Connecter mon agent
                         </router-link>
@@ -262,6 +266,7 @@ import {
 } from 'lucide-vue-next'
 import LanCard from '@/components/lan/LanCard.vue'
 import LanFeedList from '@/components/lan/LanFeedList.vue'
+import LanQueues from '@/components/lan/LanQueues.vue'
 import LanRoundRecap from '@/components/lan/LanRoundRecap.vue'
 import LanStandingsTable from '@/components/lan/LanStandingsTable.vue'
 import OfferPicker from '@/components/lan/OfferPicker.vue'
@@ -326,6 +331,7 @@ export default {
     Hourglass,
     LanCard,
     LanFeedList,
+    LanQueues,
     LanRoundRecap,
     LanStandingsTable,
     LiveIndicator,

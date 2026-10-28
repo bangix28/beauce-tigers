@@ -77,7 +77,8 @@ export const currentLan = (status: 'upcoming' | 'in_progress' = 'in_progress'): 
     name: "LAN d'automne",
     startsAt: '2026-11-07T14:00:00+01:00',
     endsAt: '2026-11-08T04:00:00+01:00',
-    status
+    status,
+    queues: [{ id: 2400, label: 'ARAM du chaos' }]
   },
   riotIds: ['Moi#EUW']
 })

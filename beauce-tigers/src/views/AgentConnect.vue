@@ -19,6 +19,10 @@
           <p v-if="pairing.player.riotIds.length" class="lan-muted text-sm">
             Compte suivi : {{ pairing.player.riotIds.join(', ') }}
           </p>
+          <p class="lan-muted text-sm" data-test="agent-timing">
+            Lance-le avant chaque partie : démarré après 90 s de jeu, la partie ne compte pour
+            personne.
+          </p>
         </div>
 
         <form v-else key="form" novalidate @submit.prevent="approve">

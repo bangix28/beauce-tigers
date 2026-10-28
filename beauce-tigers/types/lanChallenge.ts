@@ -4,10 +4,16 @@
 
 import type { LanSummary } from './player'
 
+/** File où les parties de la LAN comptent : 2400 ARAM du chaos, 420 classée solo/duo, 440 classée flexible */
+export interface LanQueue {
+  id: number
+  label: string
+}
+
 /** LAN du joueur connecté : en cours, sinon la prochaine. Une LAN terminée n'y figure plus */
 export interface CurrentLan {
   /** null : inscrit à aucune LAN en cours ou à venir */
-  lan: (LanSummary & { status: 'upcoming' | 'in_progress' }) | null
+  lan: (LanSummary & { status: 'upcoming' | 'in_progress'; queues: LanQueue[] }) | null
   /** Comptes du joueur inscrits à cette LAN */
   riotIds: string[]
 }
