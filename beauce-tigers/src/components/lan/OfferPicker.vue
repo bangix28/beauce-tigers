@@ -229,7 +229,8 @@ export default {
       return this.selectedSlot != null && this.selectedSlot !== slot
     },
     cardName(card) {
-      return card.points ? `${card.label}, ${card.points} points` : card.label
+      const name = card.theme === 'bond' ? `${card.label}, carte Lien` : card.label
+      return card.points ? `${name}, ${card.points} points` : name
     },
     focusCard(slot) {
       const cards = this.$refs.cards ?? []

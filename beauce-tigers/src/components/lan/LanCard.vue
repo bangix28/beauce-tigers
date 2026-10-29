@@ -4,6 +4,7 @@
     :class="[
       `lan-card--${card.rarity}`,
       {
+        'lan-card--bond': card.theme === 'bond',
         'lan-card--selected': selected,
         'lan-card--compact': compact,
         'lan-card--face-down': faceDown,
@@ -19,7 +20,12 @@
           <span class="lan-card__sheen" aria-hidden="true"></span>
 
           <div class="lan-card__top">
-            <span class="lan-card__rarity">{{ rarityLabel }}</span>
+            <span class="lan-card__tags">
+              <span class="lan-card__rarity">{{ rarityLabel }}</span>
+              <span v-if="themeLabel" class="lan-card__theme" data-test="card-theme">
+                <PawPrint class="lan-card__theme-icon" stroke-width="2" aria-hidden="true" />{{ themeLabel }}
+              </span>
+            </span>
             <span v-if="card.points" class="lan-card__points">
               {{ card.points }}<span class="lan-card__points-unit"> pts</span>
             </span>
@@ -64,7 +70,9 @@
 <script>
 import {
   Axe,
+  BookHeart,
   Brush,
+  Cat,
   Crosshair,
   Crown,
   Droplet,
@@ -72,6 +80,7 @@ import {
   Flame,
   Ghost,
   HandCoins,
+  HandHeart,
   HeartHandshake,
   Infinity as InfinityIcon,
   Lock,
@@ -109,7 +118,10 @@ const CARD_ICONS = {
   bad_loser: ThumbsDown,
   martyr: Ghost,
   pickpocket: HandCoins,
-  curse: Skull
+  curse: Skull,
+  where_is_mama: Cat,
+  all_for_you: HandHeart,
+  avenger: BookHeart
 }
 
 // Les séries d'éliminations partagent une famille d'icônes : le badge les distingue
@@ -125,6 +137,11 @@ const RARITY_LABELS = {
   gold: 'Or',
   prismatic: 'Prismatique',
   saboteur: 'Saboteur'
+}
+
+// Un thème que le front ne connaît pas encore s'affiche sans badge
+const THEME_LABELS = {
+  bond: 'Lien'
 }
 
 // Carte défi façon augment d'ARAM : matière selon la rareté, dos Tigers, sceau une fois verrouillée
@@ -160,6 +177,9 @@ export default {
     },
     rarityLabel() {
       return RARITY_LABELS[this.card.rarity] ?? this.card.rarity
+    },
+    themeLabel() {
+      return THEME_LABELS[this.card.theme] ?? null
     }
   },
   watch: {
@@ -363,6 +383,14 @@ export default {
   gap: 0.5rem;
 }
 
+.lan-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
 /* Seule capitale espacée restante du thème : l'étiquette de rareté */
 .lan-card__rarity {
   font-size: 0.68rem;
@@ -370,6 +398,50 @@ export default {
   text-transform: uppercase;
   letter-spacing: 0.18em;
   color: var(--rarity-accent);
+}
+
+/* --- Thème Lien : la rareté reste le cadre, Yuumi s'ajoute par-dessus --- */
+.lan-card__theme {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.1rem 0.45rem 0.1rem 0.35rem;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, var(--lan-bond-pink), var(--lan-bond-violet));
+  color: var(--lan-bond-ink);
+  font-size: 0.7rem;
+  font-weight: bold;
+  line-height: 1.3;
+  box-shadow: 0 0 10px rgba(244, 166, 200, 0.35);
+}
+
+.lan-card__theme-icon {
+  width: 0.75rem;
+  height: 0.75rem;
+  flex-shrink: 0;
+}
+
+.lan-card--bond .lan-card__frame {
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--lan-bond-pink) 45%, transparent),
+    inset 0 -30px 40px -20px color-mix(in srgb, var(--lan-bond-violet) 30%, transparent);
+}
+
+.lan-card--bond .lan-card__medal {
+  box-shadow:
+    inset 0 0 14px rgba(0, 0, 0, 0.35),
+    0 0 0 3px color-mix(in srgb, var(--lan-bond-pink) 22%, transparent);
+}
+
+.lan-card--bond:hover:not(.lan-card--compact):not(.lan-card--dimmed):not(.lan-card--selected) {
+  box-shadow:
+    0 14px 30px rgba(0, 0, 0, 0.4),
+    0 0 26px rgba(244, 166, 200, 0.35),
+    0 0 18px var(--rarity-glow);
+}
+
+.lan-card--compact .lan-card__theme {
+  font-size: 0.65rem;
 }
 
 .lan-card__points {
