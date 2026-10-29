@@ -110,8 +110,7 @@ export const standing = (overrides: Partial<StandingEntry> = {}): StandingEntry 
   successes: 2,
   roundsPlayed: 3,
   rerollsLeft: 2,
-  activeCard: null,
-  secretCard: false,
+  cardChosen: false,
   cardLocked: false,
   ...overrides
 })

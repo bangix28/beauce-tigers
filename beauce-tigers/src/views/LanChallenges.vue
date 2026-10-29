@@ -239,7 +239,11 @@
           <aside class="space-y-6 min-w-0">
             <section class="lan-panel">
               <h2 class="lan-title">Classement</h2>
-              <LanStandingsTable :entries="standings?.entries ?? []" :my-riot-id="myRun.riotId" />
+              <LanStandingsTable
+                :entries="standings?.entries ?? []"
+                :my-riot-id="myRun.riotId"
+                :my-card="myRun.run?.activeCard ?? null"
+              />
             </section>
             <section class="lan-panel">
               <h2 class="lan-title">Exploits de la soirée</h2>
