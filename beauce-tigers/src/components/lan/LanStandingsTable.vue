@@ -18,7 +18,13 @@
           </span>
           <span class="standings__status" :class="`standings__status--${status(entry).tone}`">
             <component :is="status(entry).icon" class="standings__status-icon" aria-hidden="true" />
-            {{ status(entry).text }}
+            <!-- Carte visible : survol, focus ou toucher montrent la vraie carte -->
+            <span v-if="status(entry).card" class="standings__status-text">
+              {{ status(entry).prefix }}<CardPeek :card="status(entry).card">
+                <span class="standings__card" data-test="standings-card">{{ status(entry).card.label }}</span>
+              </CardPeek>
+            </span>
+            <span v-else class="standings__status-text">{{ status(entry).text }}</span>
           </span>
         </span>
 
@@ -31,17 +37,21 @@
 </template>
 
 <script>
-import { CircleCheck, CircleDashed, EyeOff, Gamepad2, Layers } from 'lucide-vue-next'
+import { CircleCheck, CircleDashed, Gamepad2, Layers } from 'lucide-vue-next'
+import CardPeek from '@/components/lan/CardPeek.vue'
 
 const successesLabel = (count) => (count > 1 ? `${count} défis réussis` : `${count} défi réussi`)
 
-// Classement de la LAN. Une carte saboteur n'est jamais révélée : l'API renvoie
-// activeCard null et secretCard true, on affiche seulement « carte secrète ».
+// Classement de la LAN. L'API ne dit jamais quelle carte ont les autres
+// (cardChosen) : seule la sienne s'affiche, depuis le parcours du joueur.
 export default {
   name: 'LanStandingsTable',
+  components: { CardPeek },
   props: {
     entries: { type: Array, required: true },
-    myRiotId: { type: String, default: null }
+    myRiotId: { type: String, default: null },
+    /** Carte en cours du joueur connecté (son parcours), seule carte révélée du classement */
+    myCard: { type: Object, default: null }
   },
   methods: {
     isMe(entry) {
@@ -50,10 +60,18 @@ export default {
     status(entry) {
       if (!entry.joined) return { icon: CircleDashed, tone: 'idle', text: 'Pas encore dans le jeu' }
 
-      const card = entry.secretCard ? 'Carte secrète' : entry.activeCard?.label
-      if (!card) return { icon: CircleCheck, tone: 'score', text: successesLabel(entry.successes) }
-      if (entry.cardLocked) return { icon: Gamepad2, tone: 'playing', text: `En partie · ${card}` }
-      return { icon: entry.secretCard ? EyeOff : Layers, tone: 'card', text: card }
+      if (!entry.cardChosen) return { icon: CircleCheck, tone: 'score', text: successesLabel(entry.successes) }
+
+      const card = this.isMe(entry) ? this.myCard : null
+      if (card) {
+        return entry.cardLocked
+          ? { icon: Gamepad2, tone: 'playing', prefix: 'En partie · ', card }
+          : { icon: Layers, tone: 'card', prefix: '', card }
+      }
+
+      return entry.cardLocked
+        ? { icon: Gamepad2, tone: 'playing', text: 'En partie' }
+        : { icon: Layers, tone: 'card', text: 'Carte choisie' }
     }
   }
 }
@@ -147,6 +165,21 @@ export default {
   white-space: nowrap;
   font-size: 0.85rem;
   color: var(--lan-ink-soft);
+}
+
+.standings__status-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Nom de carte survolable : souligné en pointillé, la vraie carte sort au survol */
+.standings__card {
+  color: var(--lan-ink);
+  text-decoration: underline dotted color-mix(in srgb, var(--lan-gold) 60%, transparent);
+  text-underline-offset: 3px;
+  cursor: help;
 }
 
 .standings__status-icon {

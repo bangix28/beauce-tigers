@@ -103,9 +103,8 @@ export interface StandingEntry {
   successes: number
   roundsPlayed: number
   rerollsLeft: number
-  /** null aussi quand la carte est secrète (voir secretCard) */
-  activeCard: ChallengeCard | null
-  secretCard: boolean
+  /** Le joueur a une carte en cours ; laquelle n'est jamais donnée, saboteur ou non */
+  cardChosen: boolean
   cardLocked: boolean
 }
 

@@ -1,7 +1,9 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import LanStandingsTable from './LanStandingsTable.vue'
 import { card, standing } from '@/test/lanFixtures'
+
+const WINGMAN = card({ code: 'wingman', label: 'Bras droit', description: 'Réalise au moins 20 assistances.' })
 
 describe('LanStandingsTable', () => {
   it('affiche « Toi » pour le joueur connecté', () => {
@@ -30,12 +32,44 @@ describe('LanStandingsTable', () => {
     expect(rows[1].text()).toContain('2 défis réussis')
   })
 
-  it('ne révèle jamais une carte secrète', () => {
+  it('la carte des autres reste cachée : on sait seulement qu\'ils en ont une', () => {
     const wrapper = mount(LanStandingsTable, {
-      props: { entries: [standing({ secretCard: true, activeCard: null, cardLocked: true })] }
+      props: {
+        entries: [
+          standing({ cardChosen: true, cardLocked: true }),
+          standing({ rank: 2, riotId: 'B#EUW', cardChosen: true })
+        ],
+        myRiotId: 'Moi#EUW',
+        myCard: WINGMAN
+      }
     })
 
-    expect(wrapper.text()).toContain('En partie · Carte secrète')
-    expect(wrapper.text()).not.toContain(card().label)
+    const rows = wrapper.findAll('li')
+    expect(rows[0].text()).toContain('En partie')
+    expect(rows[1].text()).toContain('Carte choisie')
+    expect(wrapper.text()).not.toContain('Bras droit')
+    expect(wrapper.text()).not.toContain('secrète')
+    expect(wrapper.find('.card-peek-trigger').exists()).toBe(false)
+  })
+
+  it('au survol de sa propre carte, la vraie carte sort avec sa description', async () => {
+    vi.useFakeTimers()
+    const wrapper = mount(LanStandingsTable, {
+      props: {
+        entries: [standing({ riotId: 'Moi#EUW', cardChosen: true, cardLocked: true })],
+        myRiotId: 'Moi#EUW',
+        myCard: WINGMAN
+      },
+      attachTo: document.body
+    })
+
+    expect(wrapper.text()).toContain('En partie · Bras droit')
+    await wrapper.find('.card-peek-trigger').trigger('mouseenter')
+    vi.advanceTimersByTime(100)
+    await wrapper.vm.$nextTick()
+
+    expect(document.body.querySelector('[data-test="card-peek"]')?.textContent).toContain('Réalise au moins 20 assistances.')
+    wrapper.unmount()
+    vi.useRealTimers()
   })
 })

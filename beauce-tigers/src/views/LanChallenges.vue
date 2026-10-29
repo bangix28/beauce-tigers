@@ -239,7 +239,11 @@
           <aside class="space-y-6 min-w-0">
             <section class="lan-panel">
               <h2 class="lan-title">Classement</h2>
-              <LanStandingsTable :entries="standings?.entries ?? []" :my-riot-id="myRun.riotId" />
+              <LanStandingsTable
+                :entries="standings?.entries ?? []"
+                :my-riot-id="myRun.riotId"
+                :my-card="myRun.run?.activeCard ?? null"
+              />
             </section>
             <section class="lan-panel">
               <h2 class="lan-title">Exploits de la soirée</h2>
@@ -251,6 +255,15 @@
     </Transition>
 
     <ToastStack :toasts="visibleToasts" @dismiss="dismissToast" />
+
+    <RoundEndPopup
+      v-if="celebratedGame"
+      :key="celebratedGame.gameId"
+      :game="celebratedGame"
+      :my-riot-id="myRun?.riotId ?? null"
+      :remaining="celebrationQueue.length - 1"
+      @close="nextCelebration"
+    />
   </div>
 </template>
 
@@ -271,6 +284,7 @@ import LanRoundRecap from '@/components/lan/LanRoundRecap.vue'
 import LanStandingsTable from '@/components/lan/LanStandingsTable.vue'
 import OfferPicker from '@/components/lan/OfferPicker.vue'
 import RerollPips from '@/components/lan/RerollPips.vue'
+import RoundEndPopup from '@/components/lan/RoundEndPopup.vue'
 import RoundResultCard from '@/components/lan/RoundResultCard.vue'
 import RunHistory from '@/components/lan/RunHistory.vue'
 import RunStepper from '@/components/lan/RunStepper.vue'
@@ -282,6 +296,7 @@ import StatusLine from '@/components/ui/StatusLine.vue'
 import ToastStack from '@/components/ui/ToastStack.vue'
 import { useLanChallengeStore } from '@/stores/lanChallengeStore'
 import { PICKPOCKET_CODE, readRunScreen } from '@/utils/lanRunState'
+import { recapByGame } from '@/utils/roundRecap'
 import { utilsTools } from '@/mixins/utilsTools.js'
 
 /** Verrouillage et règlement sont automatiques : on relit le parcours à ce rythme */
@@ -339,6 +354,7 @@ export default {
     PlugZap,
     RefreshCw,
     RerollPips,
+    RoundEndPopup,
     RoundResultCard,
     RunHistory,
     RunStepper,
@@ -371,7 +387,9 @@ export default {
        * gameId du dernier résultat dont le joueur a pris connaissance (il a
        * relancé ou choisi depuis). Tant qu'il ne l'a pas fait, l'étape est « Verdict ».
        */
-      acknowledgedGameId: null
+      acknowledgedGameId: null,
+      /** Matchs réglés depuis l'arrivée sur la page, dont le résumé reste à montrer */
+      celebrationQueue: []
     }
   },
   computed: {
@@ -405,6 +423,16 @@ export default {
     /** Le fil est chargé large pour le récap ; les exploits n'en montrent que le haut */
     latestFeed() {
       return this.feed.slice(0, EXPLOITS_SHOWN)
+    },
+    /** Résumé de fin de manche affiché : le plus ancien match en attente encore présent au fil */
+    celebratedGame() {
+      if (!this.celebrationQueue.length) return null
+      const games = recapByGame(this.feed)
+      for (const gameId of this.celebrationQueue) {
+        const game = games.find((candidate) => candidate.gameId === gameId)
+        if (game) return game
+      }
+      return null
     },
     pageError() {
       return this.lanChallengeStore.pageError
@@ -526,13 +554,19 @@ export default {
     onVisibilityChange() {
       if (!document.hidden && this.refreshTimer) this.lanChallengeStore.refresh()
     },
-    /** Côté victime : un Pickpocket arrivé au fil depuis la dernière lecture */
+    /**
+     * Nouveautés du fil depuis la dernière lecture : un match réglé ouvre le
+     * résumé de fin de manche ; côté victime, un Pickpocket déclenche un toast.
+     */
     onFeedChange(entries) {
       if (!this.seenFeedKeys || !this.myRun) return
       entries.forEach((entry) => {
         const key = feedKey(entry)
         if (this.seenFeedKeys.has(key)) return
         this.seenFeedKeys.add(key)
+        if (entry.kind === 'round' && entry.gameId != null && !this.celebrationQueue.includes(entry.gameId)) {
+          this.celebrationQueue = [...this.celebrationQueue, entry.gameId]
+        }
         // La Malédiction reste secrète pour sa cible : seul le vol se remarque
         if (
           entry.kind === 'sabotage' &&
@@ -581,6 +615,11 @@ export default {
       this.acknowledgeLastResult()
       this.dismissTag('sabotage')
       this.lanChallengeStore.reroll(slot)
+    },
+    nextCelebration() {
+      const shown = this.celebratedGame?.gameId
+      // Les matchs passés devant (sortis du fil) partent avec celui qu'on referme
+      this.celebrationQueue = this.celebrationQueue.slice(this.celebrationQueue.indexOf(shown) + 1)
     },
     acknowledgeLastResult() {
       if (this.screen.kind === 'offer') {
