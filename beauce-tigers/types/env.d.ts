@@ -19,6 +19,11 @@ interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
 
+/** Version de l'appli, celle du package.json, cf. vite.config.js */
+declare const __APP_VERSION__: string
+/** Identifiant du build en cours ('dev' hors build), cf. vite.config.js */
+declare const __APP_BUILD__: string
+
 declare module '*.vue' {
   import type { DefineComponent } from 'vue'
   const component: DefineComponent<{}, {}, any>
