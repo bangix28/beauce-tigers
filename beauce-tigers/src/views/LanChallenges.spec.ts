@@ -48,7 +48,8 @@ let wrapper: VueWrapper | null = null
 
 const mountPage = async () => {
   wrapper = mount(LanChallenges, {
-    global: { stubs: { RouterLink: { template: '<a><slot /></a>' } } }
+    // Le canvas des feux d'artifice n'existe pas dans jsdom
+    global: { stubs: { RouterLink: { template: '<a><slot /></a>' }, FireworksBurst: true } }
   })
   await flushPromises()
   return wrapper
@@ -256,6 +257,65 @@ describe('LanChallenges', () => {
         t.text().includes('Quelqu\'un t\'a fait les poches… une relance en moins.')
       )
       expect(toasts).toHaveLength(1)
+    })
+  })
+
+  describe('résumé de fin de manche', () => {
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    const roundOf = (riotId: string, gameId: string, points: number) =>
+      feedEntry({ riotId, gameId, points, verdict: points > 0 ? 'success' : 'failure', occurredAt: `2026-11-07T21:00:00+01:00` })
+
+    it('un match réglé depuis l\'arrivée ouvre le podium, le champion en tête', async () => {
+      vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] })
+      // Match déjà réglé à l'arrivée : pas de pop-up
+      api.getFeed.mockResolvedValue({ entries: [roundOf('Ami#EUW', 'EUW1_1', 10)] })
+
+      const page = await mountPage()
+      expect(document.body.querySelector('[data-test="round-end"]')).toBeNull()
+
+      api.getFeed.mockResolvedValue({
+        entries: [roundOf('Moi#EUW', 'EUW1_2', 25), roundOf('Ami#EUW', 'EUW1_2', 60), roundOf('Ami#EUW', 'EUW1_1', 10)]
+      })
+      vi.advanceTimersByTime(15 * 1000)
+      await flushPromises()
+
+      const popup = document.body.querySelector('[data-test="round-end"]')
+      expect(popup?.textContent).toContain('Ami#EUW remporte la manche !')
+      expect(popup?.querySelector('[data-test="podium-champion"]')?.textContent).toContain('+60')
+      expect(popup?.querySelectorAll('.round-line')).toHaveLength(2)
+
+      ;(popup?.querySelector('.round-end__close') as HTMLButtonElement).click()
+      await flushPromises()
+      expect(document.body.querySelector('[data-test="round-end"]')).toBeNull()
+      // Rien à voir avec le clic sur la page derrière
+      expect(page.exists()).toBe(true)
+    })
+
+    it('deux matchs réglés en même temps passent l\'un après l\'autre', async () => {
+      vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] })
+      await mountPage()
+
+      api.getFeed.mockResolvedValue({
+        entries: [roundOf('Moi#EUW', 'EUW1_3', 25), roundOf('Ami#EUW', 'EUW1_4', 0)]
+      })
+      vi.advanceTimersByTime(15 * 1000)
+      await flushPromises()
+
+      const close = () => (document.body.querySelector('.round-end__close') as HTMLButtonElement)
+      expect(document.body.querySelector('[data-test="round-end"]')?.textContent).toContain('Tu remportes la manche !')
+      expect(close().textContent).toContain('Manche suivante')
+
+      close().click()
+      await flushPromises()
+      expect(document.body.querySelector('[data-test="round-end"]')?.textContent).toContain('Personne n\'a marqué cette manche')
+      expect(document.body.querySelector('[data-test="podium-champion"]')).toBeNull()
+
+      close().click()
+      await flushPromises()
+      expect(document.body.querySelector('[data-test="round-end"]')).toBeNull()
     })
   })
 
