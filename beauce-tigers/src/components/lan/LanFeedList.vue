@@ -29,7 +29,13 @@
           </template>
 
           <template v-else-if="entry.verdict === 'success'">
-            <strong>{{ who(entry) }}</strong> : {{ entry.card.label }} réussi,
+            <strong>{{ who(entry) }}</strong> : {{ entry.card.label }}<span
+              v-if="entry.card.theme === 'bond'"
+              class="feed__bond"
+              role="img"
+              aria-label="carte Lien"
+              data-test="feed-bond"
+            ><PawPrint class="feed__bond-icon" stroke-width="2.25" aria-hidden="true" /></span> réussi,
             <span class="lan-points feed__points">+{{ entry.points }}</span>{{ successExtra(entry) }}
           </template>
 
@@ -51,7 +57,7 @@
 </template>
 
 <script>
-import { CircleCheck, CircleHelp, CircleX, HandCoins, Skull } from 'lucide-vue-next'
+import { CircleCheck, CircleHelp, CircleX, HandCoins, PawPrint, Skull } from 'lucide-vue-next'
 import { utilsTools } from '@/mixins/utilsTools.js'
 
 const VERDICT_ICONS = {
@@ -64,6 +70,7 @@ const VERDICT_ICONS = {
 // riotId est la cible : le saboteur n'est jamais nommé.
 export default {
   name: 'LanFeedList',
+  components: { PawPrint },
   mixins: [utilsTools],
   props: {
     entries: { type: Array, required: true },
@@ -165,6 +172,24 @@ export default {
 
 .feed__item--me .feed__text strong {
   color: var(--lan-tiger);
+}
+
+/* Réussite d'une carte Lien : petite patte aux couleurs de Yuumi */
+.feed__bond {
+  display: inline-grid;
+  place-items: center;
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-left: 0.3rem;
+  vertical-align: -0.15rem;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, var(--lan-bond-pink), var(--lan-bond-violet));
+  color: var(--lan-bond-ink);
+}
+
+.feed__bond-icon {
+  width: 0.7rem;
+  height: 0.7rem;
 }
 
 .feed__points {

@@ -16,10 +16,18 @@ export const card = (overrides: Partial<ChallengeCard> = {}): ChallengeCard => (
   label: 'Doublé',
   description: 'Réussis un doublé.',
   rarity: 'silver',
+  theme: null,
   points: 10,
   secret: false,
   needsTarget: false,
   ...overrides
+})
+
+export const whereIsMama = card({
+  code: 'where_is_mama',
+  label: 'Où est maman ?',
+  description: "Fais une assistance sur au moins 12 kills d'un même coéquipier (6 sur la Faille).",
+  theme: 'bond'
 })
 
 export const pickpocket = card({

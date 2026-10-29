@@ -19,6 +19,8 @@ export interface CurrentLan {
 }
 
 export type CardRarity ='silver' | 'gold' | 'prismatic' | 'saboteur'
+/** bond : « Lien », jouer pour ses coéquipiers à la Yuumi (docs/front/cartes-lien.md) */
+export type CardTheme = 'bond'
 export type Verdict = 'success' | 'failure' | 'unknown'
 
 /** Une carte a la même forme partout : offre, carte active, résultats, fil */
@@ -28,6 +30,8 @@ export interface ChallengeCard {
   label: string
   description: string
   rarity: CardRarity
+  /** Thème transversal aux raretés, pour l'affichage seulement ; null sans thème */
+  theme: CardTheme | null
   points: number
   /** Carte saboteur : ne jamais l'afficher aux autres joueurs */
   secret: boolean

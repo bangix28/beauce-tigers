@@ -38,6 +38,11 @@
     --lan-pearl-3: #B5EAD7;
     --lan-pearl-4: #A0C4FF;
 
+    /* Thème Lien : couleurs de Yuumi, par-dessus la matière de rareté */
+    --lan-bond-pink: #F4A6C8;
+    --lan-bond-violet: #9B7BD4;
+    --lan-bond-ink: #2B1B3D;
+
     /* Formes */
     --lan-radius: 14px;
     --lan-radius-btn: 10px;
